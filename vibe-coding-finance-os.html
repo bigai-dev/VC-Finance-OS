@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Vibe Coding Finance OS · Funnel Duo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:           #0a0a0a;
+    --bg-elev:      #111111;
+    --bg-card:      #141414;
+    --bg-card-hi:   #1a1a1a;
+    --border:       #1f1f1f;
+    --border-hi:    #2a2a2a;
+    --gold:         #FFD600;
+    --gold-dim:     rgba(255, 214, 0, 0.55);
+    --gold-glow:    rgba(255, 214, 0, 0.15);
+    --text:         #f5f5f5;
+    --text-mid:     #9a9a9a;
+    --text-dim:     #555555;
+    --green:        #00ff9d;
+    --orange:       #ffaa00;
+    --red:          #ff3355;
+    --blue:         #4dd0ff;
+    --mono:         'JetBrains Mono', ui-monospace, monospace;
+    --serif:        'Instrument Serif', Georgia, serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  body {
+    background:
+      radial-gradient(circle at 20% 0%, rgba(255,214,0,0.06), transparent 50%),
+      radial-gradient(circle at 80% 100%, rgba(255,214,0,0.04), transparent 50%),
+      var(--bg);
+    background-attachment: fixed;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Subtle grain */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1;
+    mix-blend-mode: overlay;
+  }
+
+  .app {
+    position: relative;
+    z-index: 2;
+    max-width: 1480px;
+    margin: 0 auto;
+    padding: 24px 32px 64px;
+  }
+
+  /* ===== HEADER ===== */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 24px;
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    border-radius: 4px;
+    margin-bottom: 24px;
+    position: relative;
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--gold);
+    box-shadow: 0 0 12px var(--gold-glow);
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .brand-mark {
+    width: 36px; height: 36px;
+    background: var(--gold);
+    color: #000;
+    display: grid;
+    place-items: center;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: -0.5px;
+    border-radius: 3px;
+    position: relative;
+  }
+
+  .brand-mark::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border: 1px solid var(--gold-dim);
+    border-radius: 4px;
+    opacity: 0.4;
+  }
+
+  .brand-text { display: flex; flex-direction: column; line-height: 1.1; }
+  .brand-name { font-size: 11px; color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase; }
+  .brand-title { font-family: var(--serif); font-size: 22px; color: var(--text); letter-spacing: -0.5px; }
+  .brand-title em { color: var(--gold); font-style: italic; }
+
+  .header-meta {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    font-size: 11px;
+    color: var(--text-mid);
+  }
+
+  .live-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: rgba(0, 255, 157, 0.08);
+    border: 1px solid rgba(0, 255, 157, 0.3);
+    color: var(--green);
+    border-radius: 2px;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    font-weight: 600;
+  }
+
+  .pulse {
+    width: 6px; height: 6px;
+    background: var(--green);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--green);
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.85); }
+  }
+
+  .clock {
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+  }
+
+  .user-chip {
+    display: flex; align-items: center; gap: 10px;
+    padding: 6px 12px 6px 6px;
+    background: var(--bg-card-hi);
+    border: 1px solid var(--border-hi);
+    border-radius: 100px;
+  }
+
+  .user-avatar {
+    width: 24px; height: 24px;
+    background: linear-gradient(135deg, var(--gold), #ff8800);
+    color: #000;
+    border-radius: 50%;
+    display: grid; place-items: center;
+    font-size: 10px; font-weight: 700;
+  }
+
+  /* ===== SECTION LABEL ===== */
+  .section-label {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin: 32px 0 14px;
+  }
+
+  .section-label-text {
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-label-text::before {
+    content: '';
+    width: 18px;
+    height: 1px;
+    background: var(--gold);
+  }
+
+  .section-meta {
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 1.5px;
+  }
+
+  /* ===== KPI GRID ===== */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .kpi {
+    background: var(--bg-card);
+    padding: 18px 18px 16px;
+    position: relative;
+    transition: background 0.2s;
+  }
+
+  .kpi:hover { background: var(--bg-card-hi); }
+
+  .kpi-label {
+    font-size: 9.5px;
+    color: var(--text-dim);
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .kpi-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--gold);
+    box-shadow: 0 0 6px var(--gold-glow);
+  }
+
+  .kpi-value {
+    font-family: var(--serif);
+    font-size: 32px;
+    line-height: 1;
+    color: var(--text);
+    letter-spacing: -1px;
+    margin-bottom: 8px;
+  }
+
+  .kpi-value .currency { font-family: var(--mono); font-size: 13px; color: var(--text-mid); margin-right: 4px; vertical-align: 5px; font-style: normal; }
+  .kpi-value.gold { color: var(--gold); }
+
+  .kpi-delta {
+    font-size: 11px;
+    color: var(--text-mid);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .kpi-delta .up { color: var(--green); }
+  .kpi-delta .down { color: var(--red); }
+
+  .kpi-bar {
+    margin-top: 10px;
+    height: 3px;
+    background: var(--bg-elev);
+    border-radius: 1px;
+    overflow: hidden;
+  }
+
+  .kpi-bar-fill {
+    height: 100%;
+    background: var(--gold);
+    box-shadow: 0 0 6px var(--gold-glow);
+  }
+
+  /* ===== ROW LAYOUT ===== */
+  .row {
+    display: grid;
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  .row-7-3 { grid-template-columns: 7fr 3fr; }
+  .row-6-4 { grid-template-columns: 6fr 4fr; }
+  .row-1 { grid-template-columns: 1fr; }
+
+  /* ===== CARD ===== */
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .card-title {
+    font-family: var(--serif);
+    font-size: 18px;
+    color: var(--text);
+    letter-spacing: -0.3px;
+  }
+
+  .card-title small {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 1.5px;
+    margin-left: 8px;
+    text-transform: uppercase;
+  }
+
+  .card-actions {
+    display: flex;
+    gap: 6px;
+  }
+
+  .chip {
+    font-size: 9.5px;
+    padding: 4px 9px;
+    border: 1px solid var(--border-hi);
+    border-radius: 2px;
+    color: var(--text-mid);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: default;
+  }
+
+  .chip.active {
+    background: var(--gold);
+    color: #000;
+    border-color: var(--gold);
+    font-weight: 700;
+  }
+
+  .card-body { padding: 18px; }
+
+  /* ===== CHART ===== */
+  .chart-wrap { padding: 8px 18px 18px; }
+  .chart-legend {
+    display: flex;
+    gap: 18px;
+    padding: 0 18px 12px;
+    font-size: 10px;
+    color: var(--text-mid);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-swatch { width: 10px; height: 10px; border-radius: 1px; }
+
+  /* ===== FUNNEL ===== */
+  .funnel { padding: 18px; }
+
+  .funnel-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .funnel-label {
+    flex: 0 0 110px;
+    font-size: 10px;
+    color: var(--text-mid);
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+  }
+
+  .funnel-bar-wrap {
+    flex: 1;
+    height: 26px;
+    background: var(--bg-elev);
+    border-radius: 2px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .funnel-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), rgba(255,214,0,0.4));
+    display: flex;
+    align-items: center;
+    padding-left: 12px;
+    color: #000;
+    font-weight: 700;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .funnel-pct {
+    flex: 0 0 60px;
+    text-align: right;
+    font-size: 11px;
+    color: var(--text);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .funnel-delta {
+    text-align: center;
+    font-size: 10px;
+    color: var(--text-dim);
+    padding: 3px 0;
+    letter-spacing: 1px;
+  }
+
+  /* ===== WORKSHOPS ===== */
+  .workshop-list { padding: 6px 0; }
+
+  .workshop {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: center;
+    transition: background 0.15s;
+  }
+
+  .workshop:hover { background: var(--bg-card-hi); }
+  .workshop:last-child { border-bottom: none; }
+
+  .workshop-meta {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 8px;
+  }
+
+  .workshop-tag {
+    font-size: 9.5px;
+    padding: 3px 8px;
+    background: rgba(255,214,0,0.1);
+    color: var(--gold);
+    border-radius: 2px;
+    letter-spacing: 1.2px;
+    font-weight: 600;
+  }
+
+  .workshop-tag.sold { background: rgba(0,255,157,0.1); color: var(--green); }
+  .workshop-tag.upcoming { background: rgba(77, 208, 255, 0.1); color: var(--blue); }
+  .workshop-tag.corporate { background: rgba(255, 170, 0, 0.1); color: var(--orange); }
+
+  .workshop-name {
+    font-size: 14px;
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .workshop-date { font-size: 10.5px; color: var(--text-mid); letter-spacing: 0.5px; }
+
+  .progress-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  .progress {
+    flex: 1;
+    height: 5px;
+    background: var(--bg-elev);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--gold);
+    border-radius: 100px;
+    box-shadow: 0 0 6px var(--gold-glow);
+  }
+
+  .progress-fill.full { background: var(--green); box-shadow: 0 0 6px rgba(0,255,157,0.4); }
+
+  .seat-count {
+    font-size: 11px;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    min-width: 50px;
+    text-align: right;
+  }
+
+  .workshop-revenue {
+    text-align: right;
+    font-family: var(--serif);
+    font-size: 20px;
+    color: var(--text);
+    letter-spacing: -0.3px;
+  }
+
+  .workshop-revenue small {
+    display: block;
+    font-family: var(--mono);
+    font-size: 9.5px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  /* ===== PAYMENT STREAM ===== */
+  .payment-list { max-height: 480px; overflow-y: auto; }
+
+  .payment-list::-webkit-scrollbar { width: 6px; }
+  .payment-list::-webkit-scrollbar-track { background: transparent; }
+  .payment-list::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 3px; }
+
+  .payment {
+    display: grid;
+    grid-template-columns: 60px 1fr auto 90px;
+    gap: 12px;
+    padding: 11px 18px;
+    border-bottom: 1px solid var(--border);
+    align-items: center;
+    font-size: 12px;
+  }
+
+  .payment:hover { background: var(--bg-card-hi); }
+
+  .pay-time {
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.5px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .pay-name { color: var(--text); }
+  .pay-name small { display: block; color: var(--text-dim); font-size: 9.5px; margin-top: 2px; letter-spacing: 0.5px; }
+
+  .pay-amount {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .pay-status {
+    font-size: 9.5px;
+    padding: 3px 8px;
+    border-radius: 2px;
+    letter-spacing: 1.2px;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .pay-status.paid { background: rgba(0,255,157,0.1); color: var(--green); }
+  .pay-status.pending { background: rgba(255,170,0,0.1); color: var(--orange); }
+  .pay-status.refund { background: rgba(255,51,85,0.1); color: var(--red); }
+  .pay-status.partial { background: rgba(77,208,255,0.1); color: var(--blue); }
+
+  /* ===== PNL TABLE ===== */
+  .pnl-table { width: 100%; border-collapse: collapse; }
+
+  .pnl-table th {
+    text-align: right;
+    font-size: 9.5px;
+    color: var(--text-dim);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    font-weight: 500;
+  }
+
+  .pnl-table th:first-child { text-align: left; }
+
+  .pnl-table td {
+    padding: 11px 18px;
+    font-size: 12.5px;
+    border-bottom: 1px solid var(--border);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+
+  .pnl-table td:first-child { text-align: left; color: var(--text-mid); letter-spacing: 0.3px; }
+
+  .pnl-table tr.header td {
+    color: var(--gold);
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: 1.8px;
+    background: rgba(255,214,0,0.03);
+    font-weight: 600;
+  }
+
+  .pnl-table tr.subtotal td {
+    color: var(--text);
+    font-weight: 600;
+    background: var(--bg-card-hi);
+  }
+
+  .pnl-table tr.total td {
+    color: var(--gold);
+    font-family: var(--serif);
+    font-size: 18px;
+    background: rgba(255,214,0,0.05);
+    border-top: 1px solid rgba(255,214,0,0.2);
+    border-bottom: 1px solid rgba(255,214,0,0.2);
+  }
+
+  .pnl-table tr.total td:first-child {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  .pnl-table tr:hover td:not([class]) { background: rgba(255,255,255,0.02); }
+
+  .neg { color: var(--red) !important; }
+  .pos { color: var(--green) !important; }
+
+  /* ===== UNIT ECONOMICS ===== */
+  .unit-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1px;
+    background: var(--border);
+  }
+
+  .unit-card {
+    background: var(--bg-card);
+    padding: 16px 18px;
+  }
+
+  .unit-name {
+    font-size: 11px;
+    color: var(--text);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+
+  .unit-date {
+    font-size: 9.5px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .unit-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    font-size: 11px;
+    color: var(--text-mid);
+    border-bottom: 1px dashed var(--border);
+  }
+
+  .unit-row:last-of-type { border-bottom: none; }
+  .unit-row span:last-child { color: var(--text); font-variant-numeric: tabular-nums; }
+
+  .unit-margin {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border-hi);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+
+  .unit-margin-label {
+    font-size: 9.5px;
+    color: var(--text-dim);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  .unit-margin-value {
+    font-family: var(--serif);
+    font-size: 22px;
+    color: var(--gold);
+    letter-spacing: -0.5px;
+  }
+
+  /* ===== FOOTER ===== */
+  footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+  }
+
+  footer .gold { color: var(--gold); }
+
+  /* terminal line */
+  .terminal-bar {
+    background: #000;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 8px 14px;
+    font-size: 11px;
+    color: var(--green);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .terminal-bar .prompt { color: var(--gold); }
+  .terminal-bar .cursor { animation: blink 1s steps(2) infinite; color: var(--text); }
+  @keyframes blink { 0%,50%{opacity:1} 50.01%,100%{opacity:0} }
+
+  /* fade in */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .app > * { animation: fadeUp 0.5s ease-out backwards; }
+  .app > *:nth-child(1) { animation-delay: 0.05s; }
+  .app > *:nth-child(2) { animation-delay: 0.1s; }
+  .app > *:nth-child(3) { animation-delay: 0.15s; }
+  .app > *:nth-child(4) { animation-delay: 0.2s; }
+  .app > *:nth-child(5) { animation-delay: 0.25s; }
+  .app > *:nth-child(6) { animation-delay: 0.3s; }
+  .app > *:nth-child(7) { animation-delay: 0.35s; }
+  .app > *:nth-child(8) { animation-delay: 0.4s; }
+  .app > *:nth-child(n+9) { animation-delay: 0.45s; }
+
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ===== HEADER ===== -->
+  <header>
+    <div class="brand">
+      <div class="brand-mark">FD</div>
+      <div class="brand-text">
+        <span class="brand-name">FUNNEL DUO · OPERATIONS</span>
+        <span class="brand-title">Vibe Coding <em>Finance OS</em></span>
+      </div>
+    </div>
+    <div class="header-meta">
+      <span class="live-pill"><span class="pulse"></span>LIVE SYNC</span>
+      <span class="clock" id="clock">Tue, 12 May 2026 · 11:47 MYT</span>
+      <div class="user-chip">
+        <div class="user-avatar">N</div>
+        <span>Nick Lo</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== TERMINAL BAR ===== -->
+  <div class="terminal-bar">
+    <span class="prompt">$</span>
+    <span>vibe-stats --month=may26 --live --target=400000</span>
+    <span class="cursor">▍</span>
+  </div>
+
+  <!-- ===== KPI GRID ===== -->
+  <div class="section-label">
+    <span class="section-label-text">Month-to-date · May 2026</span>
+    <span class="section-meta">vs. April 2026 · 12 days elapsed · 19 remaining</span>
+  </div>
+
+  <div class="kpi-grid">
+
+    <div class="kpi">
+      <div class="kpi-label">MTD Revenue <span class="kpi-dot"></span></div>
+      <div class="kpi-value gold"><em class="currency">RM</em>398,450</div>
+      <div class="kpi-delta"><span class="up">▲ 13.2%</span> vs Apr</div>
+      <div class="kpi-bar"><div class="kpi-bar-fill" style="width: 99.6%"></div></div>
+    </div>
+
+    <div class="kpi">
+      <div class="kpi-label">New Students MTD</div>
+      <div class="kpi-value">67</div>
+      <div class="kpi-delta"><span class="up">▲ 15.5%</span> vs Apr (58)</div>
+      <div class="kpi-bar"><div class="kpi-bar-fill" style="width: 78%"></div></div>
+    </div>
+
+    <div class="kpi">
+      <div class="kpi-label">Active Students</div>
+      <div class="kpi-value">142</div>
+      <div class="kpi-delta"><span class="up">▲ 24</span> enrolled this month</div>
+      <div class="kpi-bar"><div class="kpi-bar-fill" style="width: 84%"></div></div>
+    </div>
+
+    <div class="kpi">
+      <div class="kpi-label">Show-up Rate</div>
+      <div class="kpi-value">78<span style="font-size:18px;color:var(--text-mid)">%</span></div>
+      <div class="kpi-delta"><span class="up">▲ 25 pts</span> post-optimization</div>
+      <div class="kpi-bar"><div class="kpi-bar-fill" style="width: 78%"></div></div>
+    </div>
+
+    <div class="kpi">
+      <div class="kpi-label">Outstanding Balance</div>
+      <div class="kpi-value"><em class="currency">RM</em>23,400</div>
+      <div class="kpi-delta">4 students · 5.8% of AR</div>
+      <div class="kpi-bar"><div class="kpi-bar-fill" style="width: 18%; background: var(--orange)"></div></div>
+    </div>
+
+    <div class="kpi">
+      <div class="kpi-label">Refund + Bad Debt</div>
+      <div class="kpi-value"><em class="currency">RM</em>5,200</div>
+      <div class="kpi-delta">1 refund · 1 written off · 1.3%</div>
+      <div class="kpi-bar"><div class="kpi-bar-fill" style="width: 8%; background: var(--red)"></div></div>
+    </div>
+
+  </div>
+
+  <!-- ===== REVENUE TREND + FUNNEL ===== -->
+  <div class="section-label">
+    <span class="section-label-text">Revenue Trend · 90-day rolling</span>
+    <span class="section-meta">Mar · Apr · May 2026</span>
+  </div>
+
+  <div class="row row-7-3">
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">Monthly Revenue <small>· by stream</small></div>
+        <div class="card-actions">
+          <span class="chip">3M</span>
+          <span class="chip active">90D</span>
+          <span class="chip">YTD</span>
+        </div>
+      </div>
+
+      <div class="chart-legend">
+        <span class="legend-item"><span class="legend-swatch" style="background:var(--gold)"></span>Workshop Tickets</span>
+        <span class="legend-item"><span class="legend-swatch" style="background:#ff8800"></span>Corporate Training</span>
+        <span class="legend-item"><span class="legend-swatch" style="background:var(--blue)"></span>1:1 Coaching</span>
+        <span class="legend-item"><span class="legend-swatch" style="background:#666"></span>Digital Products</span>
+        <span class="legend-item" style="margin-left:auto;color:var(--text-dim)"><span class="legend-swatch" style="background:transparent;border:1px dashed var(--gold)"></span>Target RM400K</span>
+      </div>
+
+      <div class="chart-wrap">
+        <svg viewBox="0 0 900 320" width="100%" preserveAspectRatio="none" style="display:block">
+          <!-- horizontal grid -->
+          <g stroke="#1a1a1a" stroke-width="1">
+            <line x1="60" y1="40"  x2="880" y2="40" />
+            <line x1="60" y1="100" x2="880" y2="100" />
+            <line x1="60" y1="160" x2="880" y2="160" />
+            <line x1="60" y1="220" x2="880" y2="220" />
+            <line x1="60" y1="280" x2="880" y2="280" />
+          </g>
+          <!-- y axis labels -->
+          <g fill="#555" font-family="JetBrains Mono" font-size="10" text-anchor="end">
+            <text x="50" y="44">500K</text>
+            <text x="50" y="104">400K</text>
+            <text x="50" y="164">300K</text>
+            <text x="50" y="224">200K</text>
+            <text x="50" y="284">100K</text>
+          </g>
+          <!-- target line at 400K (y=100) -->
+          <line x1="60" y1="100" x2="880" y2="100" stroke="#FFD600" stroke-width="1" stroke-dasharray="4,4" opacity="0.5" />
+          <text x="870" y="92" fill="#FFD600" font-family="JetBrains Mono" font-size="9" text-anchor="end" opacity="0.8">TARGET 400K</text>
+
+          <!-- March 285K -->
+          <g transform="translate(180, 0)">
+            <!-- digital -->
+            <rect x="-50" y="269" width="100" height="11" fill="#666" />
+            <!-- coaching -->
+            <rect x="-50" y="251" width="100" height="18" fill="#4dd0ff" />
+            <!-- corporate -->
+            <rect x="-50" y="215" width="100" height="36" fill="#ff8800" />
+            <!-- workshop -->
+            <rect x="-50" y="109" width="100" height="106" fill="#FFD600" />
+            <!-- total label -->
+            <text x="0" y="98" fill="#fff" font-family="Instrument Serif" font-size="18" text-anchor="middle">RM285K</text>
+            <text x="0" y="305" fill="#9a9a9a" font-family="JetBrains Mono" font-size="10" text-anchor="middle" letter-spacing="2">MAR 26</text>
+          </g>
+
+          <!-- April 352K -->
+          <g transform="translate(450, 0)">
+            <rect x="-50" y="263" width="100" height="17" fill="#666" />
+            <rect x="-50" y="241" width="100" height="22" fill="#4dd0ff" />
+            <rect x="-50" y="198" width="100" height="43" fill="#ff8800" />
+            <rect x="-50" y="69" width="100" height="129" fill="#FFD600" />
+            <text x="0" y="58" fill="#fff" font-family="Instrument Serif" font-size="18" text-anchor="middle">RM352K</text>
+            <text x="0" y="305" fill="#9a9a9a" font-family="JetBrains Mono" font-size="10" text-anchor="middle" letter-spacing="2">APR 26</text>
+          </g>
+
+          <!-- May 398K MTD (still 19 days remaining) -->
+          <g transform="translate(720, 0)">
+            <rect x="-50" y="261" width="100" height="19" fill="#666" />
+            <rect x="-50" y="236" width="100" height="25" fill="#4dd0ff" />
+            <rect x="-50" y="188" width="100" height="48" fill="#ff8800" />
+            <rect x="-50" y="40" width="100" height="148" fill="#FFD600" />
+            <!-- forecast ghost -->
+            <rect x="-50" y="20" width="100" height="20" fill="#FFD600" opacity="0.25" stroke="#FFD600" stroke-dasharray="3,3" stroke-width="1" />
+            <text x="0" y="14" fill="#FFD600" font-family="Instrument Serif" font-size="20" text-anchor="middle" font-style="italic">RM428K</text>
+            <text x="0" y="305" fill="#FFD600" font-family="JetBrains Mono" font-size="10" text-anchor="middle" letter-spacing="2">MAY 26 · MTD</text>
+          </g>
+
+          <!-- annotation arrow -->
+          <g opacity="0.7">
+            <text x="820" y="32" fill="#FFD600" font-family="JetBrains Mono" font-size="9" text-anchor="end">FORECAST →</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">Webinar Funnel <small>· W3 May cohort</small></div>
+        <span class="chip active">LIVE</span>
+      </div>
+
+      <div class="funnel">
+        <div class="funnel-row">
+          <div class="funnel-label">Ad Impressions</div>
+          <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:100%">184,520</div></div>
+          <div class="funnel-pct">100%</div>
+        </div>
+        <div class="funnel-delta">▼ CTR 3.8%</div>
+
+        <div class="funnel-row">
+          <div class="funnel-label">Landing Page</div>
+          <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:72%">7,012</div></div>
+          <div class="funnel-pct">3.8%</div>
+        </div>
+        <div class="funnel-delta">▼ Opt-in 41%</div>
+
+        <div class="funnel-row">
+          <div class="funnel-label">Registered</div>
+          <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:58%">2,875</div></div>
+          <div class="funnel-pct">1.56%</div>
+        </div>
+        <div class="funnel-delta">▼ Show-up 78%</div>
+
+        <div class="funnel-row">
+          <div class="funnel-label">Attended</div>
+          <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:44%">2,242</div></div>
+          <div class="funnel-pct">1.21%</div>
+        </div>
+        <div class="funnel-delta">▼ Conversion 2.4%</div>
+
+        <div class="funnel-row">
+          <div class="funnel-label">Enrolled</div>
+          <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:14%; background:linear-gradient(90deg, #00ff9d, rgba(0,255,157,0.4));color:#000">54</div></div>
+          <div class="funnel-pct" style="color:var(--green)">2.4%</div>
+        </div>
+
+        <div style="margin-top:16px; padding-top:14px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:baseline">
+          <div>
+            <div style="font-size:9.5px; color:var(--text-dim); letter-spacing:1.5px; text-transform:uppercase">Cohort ROAS</div>
+            <div style="font-family:var(--serif); font-size:28px; color:var(--gold); letter-spacing:-0.5px">11.4<span style="font-size:14px; color:var(--text-mid)">x</span></div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:9.5px; color:var(--text-dim); letter-spacing:1.5px; text-transform:uppercase">Ad Spend</div>
+            <div style="font-family:var(--serif); font-size:20px; color:var(--text); letter-spacing:-0.3px">RM 18,920</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== WORKSHOPS + PAYMENT STREAM ===== -->
+  <div class="section-label">
+    <span class="section-label-text">Workshops & Cash Flow</span>
+    <span class="section-meta">Real-time · last refresh 11:47:02 MYT</span>
+  </div>
+
+  <div class="row row-6-4">
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">Class Registrations <small>· next 8 cohorts</small></div>
+        <div class="card-actions">
+          <span class="chip active">UPCOMING</span>
+          <span class="chip">COMPLETED</span>
+        </div>
+      </div>
+
+      <div class="workshop-list">
+
+        <div class="workshop">
+          <div>
+            <div class="workshop-meta">
+              <span class="workshop-tag sold">SOLD OUT</span>
+              <span class="workshop-name">Vibe Coding Intensive · W3 May</span>
+            </div>
+            <div class="workshop-date">Sat–Sun · 17–18 May 2026 · KL HQ · waitlist 3</div>
+            <div class="progress-row">
+              <div class="progress"><div class="progress-fill full" style="width:100%"></div></div>
+              <div class="seat-count">12 / 12</div>
+            </div>
+          </div>
+          <div class="workshop-revenue">RM 48,964<small>collected</small></div>
+        </div>
+
+        <div class="workshop">
+          <div>
+            <div class="workshop-meta">
+              <span class="workshop-tag corporate">CORPORATE</span>
+              <span class="workshop-name">Koong Woh Tong · Private Vibe Coding</span>
+            </div>
+            <div class="workshop-date">Thu · 15 May 2026 · client site · 1-day</div>
+            <div class="progress-row">
+              <div class="progress"><div class="progress-fill full" style="width:100%"></div></div>
+              <div class="seat-count">25 / 25</div>
+            </div>
+          </div>
+          <div class="workshop-revenue">RM 35,000<small>50% deposit · paid</small></div>
+        </div>
+
+        <div class="workshop">
+          <div>
+            <div class="workshop-meta">
+              <span class="workshop-tag corporate">CORPORATE</span>
+              <span class="workshop-name">Confidential FSI Client · 2-day automation</span>
+            </div>
+            <div class="workshop-date">Tue–Wed · 20–21 May 2026 · KLCC · Claude Cowork</div>
+            <div class="progress-row">
+              <div class="progress"><div class="progress-fill" style="width:60%"></div></div>
+              <div class="seat-count">RM 85K</div>
+            </div>
+          </div>
+          <div class="workshop-revenue">RM 51,000<small>60% deposit · paid</small></div>
+        </div>
+
+        <div class="workshop">
+          <div>
+            <div class="workshop-meta">
+              <span class="workshop-tag upcoming">FILLING</span>
+              <span class="workshop-name">Vibe Coding Intensive · W4 May</span>
+            </div>
+            <div class="workshop-date">Sat–Sun · 24–25 May 2026 · KL HQ</div>
+            <div class="progress-row">
+              <div class="progress"><div class="progress-fill" style="width:75%"></div></div>
+              <div class="seat-count">9 / 12</div>
+            </div>
+          </div>
+          <div class="workshop-revenue">RM 35,973<small>collected</small></div>
+        </div>
+
+        <div class="workshop">
+          <div>
+            <div class="workshop-meta">
+              <span class="workshop-tag upcoming">EARLY BIRD</span>
+              <span class="workshop-name">Vibe Coding Intensive · W5 May</span>
+            </div>
+            <div class="workshop-date">Sat · 31 May 2026 · KL HQ · 1-day intensive</div>
+            <div class="progress-row">
+              <div class="progress"><div class="progress-fill" style="width:50%"></div></div>
+              <div class="seat-count">6 / 12</div>
+            </div>
+          </div>
+          <div class="workshop-revenue">RM 17,982<small>collected</small></div>
+        </div>
+
+        <div class="workshop">
+          <div>
+            <div class="workshop-meta">
+              <span class="workshop-tag upcoming">EARLY BIRD</span>
+              <span class="workshop-name">Vibe Coding Intensive · W1 June</span>
+            </div>
+            <div class="workshop-date">Sat–Sun · 7–8 June 2026 · KL HQ</div>
+            <div class="progress-row">
+              <div class="progress"><div class="progress-fill" style="width:33%"></div></div>
+              <div class="seat-count">4 / 12</div>
+            </div>
+          </div>
+          <div class="workshop-revenue">RM 11,988<small>collected</small></div>
+        </div>
+
+        <div class="workshop">
+          <div>
+            <div class="workshop-meta">
+              <span class="workshop-tag">VIP TRACK</span>
+              <span class="workshop-name">1:1 Coaching · May intake</span>
+            </div>
+            <div class="workshop-date">Rolling · 8 sessions · custom schedule</div>
+            <div class="progress-row">
+              <div class="progress"><div class="progress-fill" style="width:75%"></div></div>
+              <div class="seat-count">3 / 4</div>
+            </div>
+          </div>
+          <div class="workshop-revenue">RM 29,991<small>collected</small></div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">Payment Stream <small>· last 24h</small></div>
+        <span class="chip active">● LIVE</span>
+      </div>
+
+      <div class="payment-list">
+
+        <div class="payment">
+          <span class="pay-time">11:42</span>
+          <span class="pay-name">Tan Mei Ling 陈美玲<small>W3 May · standard</small></span>
+          <span class="pay-amount">RM 3,997</span>
+          <span class="pay-status paid">PAID</span>
+        </div>
+
+        <div class="payment">
+          <span class="pay-time">10:18</span>
+          <span class="pay-name">Ahmad Faizal Rahman<small>VIP W4 May · 1:1 bundle</small></span>
+          <span class="pay-amount">RM 7,997</span>
+          <span class="pay-status paid">PAID</span>
+        </div>
+
+        <div class="payment">
+          <span class="pay-time">09:55</span>
+          <span class="pay-name">Wong Kah Yan 黄家燕<small>W5 May · early bird</small></span>
+          <span class="pay-amount">RM 2,997</span>
+          <span class="pay-status paid">PAID</span>
+        </div>
+
+        <div class="payment">
+          <span class="pay-time">09:14</span>
+          <span class="pay-name">Priya Devi Subramaniam<small>W4 May · standard</small></span>
+          <span class="pay-amount">RM 3,997</span>
+          <span class="pay-status paid">PAID</span>
+        </div>
+
+        <div class="payment">
+          <span class="pay-time">08:32</span>
+          <span class="pay-name">Marcus Tan Boon Hwa<small>W1 June · early bird</small></span>
+          <span class="pay-amount">RM 2,997</span>
+          <span class="pay-status paid">PAID</span>
+        </div>
+
+        <div class="payment">
+          <span class="pay-time">Yest</span>
+          <span class="pay-name">Lim Wei Jian 林伟健<small>W3 May · standard</small></span>
+          <span class="pay-amount">RM 3,997</span>
+          <span class="pay-status paid">PAID</span>
+        </div>
+
+        <div class="payment">
+          <span class="pay-time">Yest</span>
+          <span class="pay-name">Siti Nurhaliza Abdullah<small>VIP W3 May · 1:1 bundle</small></span>
+          <span class="pay-amount">RM 7,997</span>
+          <span class="pay-status paid">PAID</span>
+        </div>
+
+        <div class="payment">
+          <span class="pay-time">Yest</span>
+          <span class="pay-name">Vincent Ng Chee Wei<small>Corporate · FSI client</small></span>
+          <span class="pay-amount">RM 34,000</span>
+          <span class="pay-status pending">PENDING</span>
+        </div>
+
+        <div class="payment">
+          <span class="pay-time">10 May</span>
+          <span class="pay-name">Lee Chee Wei 李志伟<small>W4 May · standard</small></span>
+          <span class="pay-amount">RM 3,997</span>
+          <span class="pay-status paid">PAID</span>
+        </div>
+
+        <div class="payment">
+          <span class="pay-time">10 May</span>
+          <span class="pay-name">Nor Aisha Ibrahim<small>1:1 Coaching · May intake</small></span>
+          <span class="pay-amount">RM 9,997</span>
+          <span class="pay-status paid">PAID</span>
+        </div>
+
+        <div class="payment">
+          <span class="pay-time">10 May</span>
+          <span class="pay-name">Raj Kumar Selvam<small>W4 May · installment 1/2</small></span>
+          <span class="pay-amount">RM 1,998</span>
+          <span class="pay-status partial">PARTIAL</span>
+        </div>
+
+        <div class="payment">
+          <span class="pay-time">09 May</span>
+          <span class="pay-name">Zulkifli Mahmud<small>W3 May · standard</small></span>
+          <span class="pay-amount">RM 3,997</span>
+          <span class="pay-status refund">REFUND</span>
+        </div>
+
+        <div class="payment">
+          <span class="pay-time">09 May</span>
+          <span class="pay-name">Khalid Bin Hassan<small>W2 May · settled</small></span>
+          <span class="pay-amount">RM 3,997</span>
+          <span class="pay-status paid">PAID</span>
+        </div>
+
+        <div class="payment">
+          <span class="pay-time">08 May</span>
+          <span class="pay-name">Jessica Chua Hui Min<small>VIP W4 May · 1:1 bundle</small></span>
+          <span class="pay-amount">RM 7,997</span>
+          <span class="pay-status paid">PAID</span>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== PNL TABLE ===== -->
+  <div class="section-label">
+    <span class="section-label-text">Profit & Loss · Monthly</span>
+    <span class="section-meta">All figures in RM · accrual basis</span>
+  </div>
+
+  <div class="row row-1">
+    <div class="card">
+      <table class="pnl-table">
+        <thead>
+          <tr>
+            <th style="width:38%">Line Item</th>
+            <th>Mar 2026</th>
+            <th>Apr 2026</th>
+            <th>May MTD</th>
+            <th>May Forecast</th>
+            <th>% of Rev</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr class="header"><td colspan="6">Revenue</td></tr>
+          <tr><td>Workshop tickets · standard + early bird</td><td>198,400</td><td>241,800</td><td>247,300</td><td>268,900</td><td>62.8%</td></tr>
+          <tr><td>VIP track · workshop + 1:1 bundle</td><td>32,000</td><td>40,000</td><td>40,000</td><td>48,000</td><td>11.2%</td></tr>
+          <tr><td>Corporate training engagements</td><td>35,000</td><td>50,000</td><td>86,000</td><td>86,000</td><td>20.1%</td></tr>
+          <tr><td>1:1 coaching upgrades</td><td>15,000</td><td>15,000</td><td>20,000</td><td>20,000</td><td>4.7%</td></tr>
+          <tr><td>Digital products · templates, recordings</td><td>4,800</td><td>5,200</td><td>5,150</td><td>5,500</td><td>1.3%</td></tr>
+          <tr class="subtotal"><td>Gross Revenue</td><td>285,200</td><td>352,000</td><td>398,450</td><td>428,400</td><td>100.0%</td></tr>
+
+          <tr class="header"><td colspan="6">Direct Costs · COGS</td></tr>
+          <tr><td>Venue rental · KL HQ + corporate sites</td><td>16,000</td><td>20,000</td><td>22,400</td><td>24,000</td><td>5.6%</td></tr>
+          <tr><td>F&amp;B · coffee, lunch, snack pack</td><td>4,800</td><td>5,800</td><td>6,400</td><td>6,800</td><td>1.6%</td></tr>
+          <tr><td>Assistant trainer fees · Jay + co-trainers</td><td>10,500</td><td>13,000</td><td>13,500</td><td>15,000</td><td>3.5%</td></tr>
+          <tr><td>Workbook printing + welcome kit</td><td>2,400</td><td>3,200</td><td>3,350</td><td>3,600</td><td>0.8%</td></tr>
+          <tr><td>Photo / video crew · social proof content</td><td>4,500</td><td>5,500</td><td>6,000</td><td>6,000</td><td>1.4%</td></tr>
+          <tr class="subtotal"><td>Total COGS</td><td>38,200</td><td>47,500</td><td>51,650</td><td>55,400</td><td>12.9%</td></tr>
+
+          <tr class="header"><td colspan="6">Marketing & Acquisition</td></tr>
+          <tr><td>Meta + Google ad spend</td><td>48,000</td><td>58,000</td><td>62,500</td><td>68,000</td><td>15.9%</td></tr>
+          <tr><td>Affiliate &amp; partner commissions · 10%</td><td>18,400</td><td>23,200</td><td>26,800</td><td>28,500</td><td>6.7%</td></tr>
+          <tr><td>Webinar platform · WebinarX in-house</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0.0%</td></tr>
+          <tr><td>Email + SMS · Resend, Mailgun, WhatsApp</td><td>850</td><td>950</td><td>980</td><td>1,000</td><td>0.2%</td></tr>
+          <tr class="subtotal"><td>Total Marketing</td><td>67,250</td><td>82,150</td><td>90,280</td><td>97,500</td><td>22.8%</td></tr>
+
+          <tr class="header"><td colspan="6">Operations & Software</td></tr>
+          <tr><td>AI stack · Claude Max, Cursor, OpenAI, Replit</td><td>2,800</td><td>3,200</td><td>3,400</td><td>3,500</td><td>0.8%</td></tr>
+          <tr><td>Infra · Supabase, Vercel, Cloudflare R2, Mux</td><td>1,200</td><td>1,450</td><td>1,520</td><td>1,600</td><td>0.4%</td></tr>
+          <tr><td>Payment processing · Stripe 3.0% + RM2</td><td>8,560</td><td>10,560</td><td>11,950</td><td>12,852</td><td>3.0%</td></tr>
+          <tr><td>Admin · transport, ops staff, contingency</td><td>4,200</td><td>4,800</td><td>5,100</td><td>5,500</td><td>1.3%</td></tr>
+          <tr class="subtotal"><td>Total OpEx</td><td>16,760</td><td>20,010</td><td>21,970</td><td>23,452</td><td>5.5%</td></tr>
+
+          <tr class="header"><td colspan="6">Adjustments</td></tr>
+          <tr><td>Refunds issued</td><td class="neg">−2,997</td><td class="neg">−3,997</td><td class="neg">−3,997</td><td class="neg">−4,000</td><td>0.9%</td></tr>
+          <tr><td>Bad debt written off</td><td class="neg">0</td><td class="neg">−1,200</td><td class="neg">−1,200</td><td class="neg">−1,500</td><td>0.4%</td></tr>
+
+          <tr class="total">
+            <td>Net Profit</td>
+            <td>159,993</td>
+            <td>197,143</td>
+            <td>229,353</td>
+            <td>246,548</td>
+            <td class="pos">57.6%</td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== UNIT ECONOMICS ===== -->
+  <div class="section-label">
+    <span class="section-label-text">Per-Workshop Unit Economics · May 2026</span>
+    <span class="section-meta">Avg ticket RM 4,080 · 12-seat cap</span>
+  </div>
+
+  <div class="row row-1">
+    <div class="card">
+      <div class="unit-grid">
+
+        <div class="unit-card">
+          <div class="unit-name">W1 May · completed</div>
+          <div class="unit-date">3–4 May · 12/12 seats</div>
+          <div class="unit-row"><span>Revenue</span><span>49,964</span></div>
+          <div class="unit-row"><span>Venue + F&amp;B</span><span>5,200</span></div>
+          <div class="unit-row"><span>Asst trainer</span><span>2,500</span></div>
+          <div class="unit-row"><span>Ads (allocated)</span><span>15,800</span></div>
+          <div class="unit-row"><span>Other</span><span>2,400</span></div>
+          <div class="unit-margin">
+            <span class="unit-margin-label">Margin</span>
+            <span class="unit-margin-value">48%</span>
+          </div>
+        </div>
+
+        <div class="unit-card">
+          <div class="unit-name">W2 May · completed</div>
+          <div class="unit-date">10–11 May · 12/12 seats</div>
+          <div class="unit-row"><span>Revenue</span><span>52,420</span></div>
+          <div class="unit-row"><span>Venue + F&amp;B</span><span>5,200</span></div>
+          <div class="unit-row"><span>Asst trainer</span><span>2,500</span></div>
+          <div class="unit-row"><span>Ads (allocated)</span><span>14,200</span></div>
+          <div class="unit-row"><span>Other</span><span>2,400</span></div>
+          <div class="unit-margin">
+            <span class="unit-margin-label">Margin</span>
+            <span class="unit-margin-value">53%</span>
+          </div>
+        </div>
+
+        <div class="unit-card">
+          <div class="unit-name">W3 May · sold out</div>
+          <div class="unit-date">17–18 May · 12/12 + WL 3</div>
+          <div class="unit-row"><span>Revenue</span><span>48,964</span></div>
+          <div class="unit-row"><span>Venue + F&amp;B</span><span>5,400</span></div>
+          <div class="unit-row"><span>Asst trainer</span><span>2,500</span></div>
+          <div class="unit-row"><span>Ads (allocated)</span><span>11,900</span></div>
+          <div class="unit-row"><span>Other</span><span>2,400</span></div>
+          <div class="unit-margin">
+            <span class="unit-margin-label">Margin</span>
+            <span class="unit-margin-value">54%</span>
+          </div>
+        </div>
+
+        <div class="unit-card">
+          <div class="unit-name">W4 May · filling</div>
+          <div class="unit-date">24–25 May · 9/12 seats</div>
+          <div class="unit-row"><span>Revenue (proj)</span><span>47,964</span></div>
+          <div class="unit-row"><span>Venue + F&amp;B</span><span>5,400</span></div>
+          <div class="unit-row"><span>Asst trainer</span><span>2,500</span></div>
+          <div class="unit-row"><span>Ads (allocated)</span><span>10,800</span></div>
+          <div class="unit-row"><span>Other</span><span>2,400</span></div>
+          <div class="unit-margin">
+            <span class="unit-margin-label">Margin (proj)</span>
+            <span class="unit-margin-value">56%</span>
+          </div>
+        </div>
+
+        <div class="unit-card">
+          <div class="unit-name">FSI Corporate · 2-day</div>
+          <div class="unit-date">20–21 May · 25 attendees</div>
+          <div class="unit-row"><span>Revenue</span><span>85,000</span></div>
+          <div class="unit-row"><span>Venue (client)</span><span>0</span></div>
+          <div class="unit-row"><span>Asst trainer</span><span>5,000</span></div>
+          <div class="unit-row"><span>Travel + ops</span><span>3,800</span></div>
+          <div class="unit-row"><span>Materials</span><span>1,800</span></div>
+          <div class="unit-margin">
+            <span class="unit-margin-label">Margin</span>
+            <span class="unit-margin-value">87%</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    <span>FUNNEL DUO · Vibe Coding Finance OS · v1.2.4</span>
+    <span>Generated by <span class="gold">Claude Code</span> · MCP synced · Stripe / Supabase / Google Sheets</span>
+    <span>Last sync 11:47:02 MYT · next refresh in 04:58</span>
+  </footer>
+
+</div>
+
+<script>
+  // Live clock
+  const clockEl = document.getElementById('clock');
+  function tick() {
+    const now = new Date();
+    // Force a Malaysia-style display anchored to the demo date but show real seconds for vibe
+    const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const pad = n => String(n).padStart(2, '0');
+    const hh = pad(now.getHours());
+    const mm = pad(now.getMinutes());
+    const ss = pad(now.getSeconds());
+    clockEl.textContent = `Tue, 12 May 2026 · ${hh}:${mm}:${ss} MYT`;
+  }
+  setInterval(tick, 1000);
+  tick();
+
+  // Subtle: increment top KPI revenue slowly to feel live
+  const revEl = document.querySelector('.kpi-value.gold');
+  let rev = 398450;
+  setInterval(() => {
+    if (Math.random() > 0.7) {
+      const bump = [2997, 3997, 7997, 2997, 9997][Math.floor(Math.random() * 5)];
+      rev += bump;
+      revEl.innerHTML = `<em class="currency">RM</em>${rev.toLocaleString('en-MY')}`;
+    }
+  }, 7000);
+</script>
+
+</body>
+</html>
