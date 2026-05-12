@@ -24,7 +24,7 @@ function KpiCell({ kpi, liveValue }: { kpi: Kpi; liveValue?: string }) {
         {kpi.currency && <em className="currency">{kpi.currency}</em>}
         {displayValue}
         {kpi.valueSuffix && (
-          <span style={{ fontSize: 18, color: "var(--text-mid)" }}>{kpi.valueSuffix}</span>
+          <span className="kpi-value-suffix">{kpi.valueSuffix}</span>
         )}
       </div>
       <div className="kpi-delta">

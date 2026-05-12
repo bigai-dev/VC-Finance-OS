@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 export function Header() {
   const [clock, setClock] = useState("Tue, 12 May 2026 · 11:47 MYT");
@@ -19,7 +20,15 @@ export function Header() {
   return (
     <header className="app-header">
       <div className="brand">
-        <div className="brand-mark">FD</div>
+        <div className="brand-logo">
+          <Image
+            src="/AI-Agency-Logo-notext.png"
+            alt="Funnel Duo"
+            width={48}
+            height={48}
+            priority
+          />
+        </div>
         <div className="brand-text">
           <span className="brand-name">FUNNEL DUO · OPERATIONS</span>
           <span className="brand-title">

@@ -1,5 +1,4 @@
 import { Header } from "@/components/Header";
-import { TerminalBar } from "@/components/TerminalBar";
 import { SectionLabel } from "@/components/SectionLabel";
 import { KpiGrid } from "@/components/KpiGrid";
 import { RevenueTrendChart } from "@/components/RevenueTrendChart";
@@ -14,7 +13,6 @@ export default function Home() {
   return (
     <div className="app">
       <Header />
-      <TerminalBar />
 
       <SectionLabel
         label="Month-to-date · May 2026"

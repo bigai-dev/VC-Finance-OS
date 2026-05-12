@@ -50,10 +50,11 @@ export function Funnel() {
           <div>
             <div
               style={{
-                fontSize: "9.5px",
-                color: "var(--text-dim)",
+                fontSize: "11.5px",
+                color: "var(--text-mid)",
                 letterSpacing: "1.5px",
                 textTransform: "uppercase",
+                fontWeight: 600,
               }}
             >
               Cohort ROAS
@@ -61,22 +62,23 @@ export function Funnel() {
             <div
               style={{
                 fontFamily: "var(--font-serif), Georgia, serif",
-                fontSize: 28,
+                fontSize: 34,
                 color: "var(--gold)",
                 letterSpacing: "-0.5px",
               }}
             >
               {funnelStats.roas}
-              <span style={{ fontSize: 14, color: "var(--text-mid)" }}>x</span>
+              <span style={{ fontSize: 17, color: "var(--text-mid)" }}>x</span>
             </div>
           </div>
           <div style={{ textAlign: "right" }}>
             <div
               style={{
-                fontSize: "9.5px",
-                color: "var(--text-dim)",
+                fontSize: "11.5px",
+                color: "var(--text-mid)",
                 letterSpacing: "1.5px",
                 textTransform: "uppercase",
+                fontWeight: 600,
               }}
             >
               Ad Spend
@@ -84,7 +86,7 @@ export function Funnel() {
             <div
               style={{
                 fontFamily: "var(--font-serif), Georgia, serif",
-                fontSize: 20,
+                fontSize: 24,
                 color: "var(--text)",
                 letterSpacing: "-0.3px",
               }}

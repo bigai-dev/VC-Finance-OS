@@ -20,6 +20,11 @@ const instrumentSerif = Instrument_Serif({
 export const metadata: Metadata = {
   title: "Vibe Coding Finance OS · Funnel Duo",
   description: "Workshop finance dashboard for Funnel Duo - live revenue, P&L, unit economics, and cash flow.",
+  icons: {
+    icon: "/AI-Agency-Logo-favicon.png",
+    shortcut: "/AI-Agency-Logo-favicon.png",
+    apple: "/AI-Agency-Logo-favicon.png",
+  },
 };
 
 export default function RootLayout({

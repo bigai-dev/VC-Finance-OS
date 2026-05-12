@@ -26,7 +26,7 @@ export function RevenueTrendChart() {
           Workshop Tickets
         </span>
         <span className="legend-item">
-          <span className="legend-swatch" style={{ background: "#ff8800" }} />
+          <span className="legend-swatch" style={{ background: "#4A66A8" }} />
           Corporate Training
         </span>
         <span className="legend-item">
@@ -65,8 +65,8 @@ export function RevenueTrendChart() {
             <text x="50" y="284">100K</text>
           </g>
           {/* target line at 400K (y=100) */}
-          <line x1="60" y1="100" x2="880" y2="100" stroke="#FFD600" strokeWidth="1" strokeDasharray="4,4" opacity="0.5" />
-          <text x="870" y="92" fill="#FFD600" fontFamily="JetBrains Mono" fontSize="9" textAnchor="end" opacity="0.8">
+          <line x1="60" y1="100" x2="880" y2="100" stroke="#EAB308" strokeWidth="1" strokeDasharray="4,4" opacity="0.5" />
+          <text x="870" y="92" fill="#EAB308" fontFamily="JetBrains Mono" fontSize="9" textAnchor="end" opacity="0.8">
             TARGET 400K
           </text>
 
@@ -85,8 +85,8 @@ export function RevenueTrendChart() {
               <g key={m.label} transform={`translate(${x}, 0)`}>
                 <rect x="-50" y={yDigital} width="100" height={digital} fill="#666" />
                 <rect x="-50" y={yCoaching} width="100" height={coaching} fill="#4dd0ff" />
-                <rect x="-50" y={yCorporate} width="100" height={corporate} fill="#ff8800" />
-                <rect x="-50" y={yWorkshop} width="100" height={workshop} fill="#FFD600" />
+                <rect x="-50" y={yCorporate} width="100" height={corporate} fill="#4A66A8" />
+                <rect x="-50" y={yWorkshop} width="100" height={workshop} fill="#EAB308" />
 
                 {isMtd && (
                   <rect
@@ -94,9 +94,9 @@ export function RevenueTrendChart() {
                     y={yWorkshop - 20}
                     width="100"
                     height="20"
-                    fill="#FFD600"
+                    fill="#EAB308"
                     opacity="0.25"
-                    stroke="#FFD600"
+                    stroke="#EAB308"
                     strokeDasharray="3,3"
                     strokeWidth="1"
                   />
@@ -105,7 +105,7 @@ export function RevenueTrendChart() {
                 <text
                   x="0"
                   y={isMtd ? totalY - 3 : totalY}
-                  fill={isMtd ? "#FFD600" : "#fff"}
+                  fill={isMtd ? "#EAB308" : "#fff"}
                   fontFamily="Instrument Serif"
                   fontSize={isMtd ? 20 : 18}
                   textAnchor="middle"
@@ -116,7 +116,7 @@ export function RevenueTrendChart() {
                 <text
                   x="0"
                   y="305"
-                  fill={isMtd ? "#FFD600" : "#9a9a9a"}
+                  fill={isMtd ? "#EAB308" : "#9a9a9a"}
                   fontFamily="JetBrains Mono"
                   fontSize="10"
                   textAnchor="middle"
@@ -129,7 +129,7 @@ export function RevenueTrendChart() {
           })}
 
           <g opacity="0.7">
-            <text x="820" y="32" fill="#FFD600" fontFamily="JetBrains Mono" fontSize="9" textAnchor="end">
+            <text x="820" y="32" fill="#EAB308" fontFamily="JetBrains Mono" fontSize="9" textAnchor="end">
               FORECAST →
             </text>
           </g>
