@@ -39,7 +39,7 @@ export default function Home() {
 
       <SectionLabel
         label="Per-Workshop Unit Economics · May 2026"
-        meta="Avg ticket RM 4,080 · 12-seat cap"
+        meta="Solo RM 3,880 + 8% SST · Pair RM 5,880 + 8% SST · 20-seat cap"
       />
       <div className="row row-1">
         <UnitEconomics />

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { ThemeToggle } from "./ThemeToggle";
 
 export function Header() {
   const [clock, setClock] = useState("Tue, 12 May 2026 · 11:47 MYT");
@@ -42,6 +43,7 @@ export function Header() {
           LIVE SYNC
         </span>
         <span className="clock">{clock}</span>
+        <ThemeToggle />
         <div className="user-chip">
           <div className="user-avatar">N</div>
           <span>Nick Lo</span>

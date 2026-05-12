@@ -47,8 +47,12 @@ function KpiCell({ kpi, liveValue }: { kpi: Kpi; liveValue?: string }) {
   );
 }
 
+// Initial value mirrors lib/mock-data.ts kpis[0].value ("152,400") so the
+// SSR-rendered KPI matches the client's first paint - no hydration mismatch.
+const INITIAL_REVENUE = 152400;
+
 export function KpiGrid() {
-  const [revenue, setRevenue] = useState<number>(398450);
+  const [revenue, setRevenue] = useState<number>(INITIAL_REVENUE);
 
   useEffect(() => {
     const id = setInterval(() => {

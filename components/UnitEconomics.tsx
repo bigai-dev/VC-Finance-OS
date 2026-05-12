@@ -5,8 +5,14 @@ export function UnitEconomics() {
     <div className="card">
       <div className="unit-grid">
         {units.map((u) => (
-          <div key={u.name} className="unit-card">
-            <div className="unit-name">{u.name}</div>
+          <div key={u.name} className="unit-card" data-status={u.status}>
+            <div className="unit-card-head">
+              <div className="unit-name">{u.name}</div>
+              <div className="unit-status">
+                <span className="status-dot" />
+                {u.statusLabel}
+              </div>
+            </div>
             <div className="unit-date">{u.date}</div>
             {u.rows.map((r) => (
               <div key={r.label} className="unit-row">

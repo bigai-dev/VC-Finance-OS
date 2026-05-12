@@ -1,6 +1,12 @@
 // Mock data for VC Finance OS dashboard.
-// Swap this file to a Supabase / API fetcher when wiring real data.
+// Today is May 12, 2026 (MTD = 12 days elapsed).
+// Pricing model (RM, SST 8%):
+//   1 pax (solo):  3,880 base + 8% = 4,190.40
+//   2 pax (pair):  5,880 base + 8% = 6,350.40
+//   3rd pax+:      2,000 each base + 8% = 2,160 each (add-on)
+// 20-seat cap per workshop.
 
+// === KPIs ===
 export type Kpi = {
   label: string;
   value: string;
@@ -14,13 +20,14 @@ export type Kpi = {
   showDot?: boolean;
 };
 
+// May MTD (12 of 31 days, only W1 May has run). Cash collected this month.
 export const kpis: Kpi[] = [
-  { label: "MTD Revenue", value: "398,450", currency: "RM", delta: "▲ 13.2% vs Apr", deltaDirection: "up", bar: 99.6, gold: true, showDot: true },
-  { label: "New Students MTD", value: "67", delta: "▲ 15.5% vs Apr (58)", deltaDirection: "up", bar: 78 },
-  { label: "Active Students", value: "142", delta: "▲ 24 enrolled this month", deltaDirection: "up", bar: 84 },
-  { label: "Show-up Rate", value: "78", valueSuffix: "%", delta: "▲ 25 pts post-optimization", deltaDirection: "up", bar: 78 },
-  { label: "Outstanding Balance", value: "23,400", currency: "RM", delta: "4 students · 5.8% of AR", deltaDirection: "neutral", bar: 18, barColor: "orange" },
-  { label: "Refund + Bad Debt", value: "5,200", currency: "RM", delta: "1 refund · 1 written off · 1.3%", deltaDirection: "neutral", bar: 8, barColor: "red" },
+  { label: "MTD Revenue",        value: "152,400", currency: "RM", delta: "▲ 8.1% vs Apr MTD pace", deltaDirection: "up",      bar: 38, gold: true, showDot: true },
+  { label: "New Students MTD",   value: "31",                       delta: "20 enrolled in W1 May + 11 advance",                deltaDirection: "up",      bar: 46 },
+  { label: "Active Students",    value: "142",                      delta: "▲ 24 enrolled YTD",                                 deltaDirection: "up",      bar: 84 },
+  { label: "Show-up Rate",       value: "58.7", valueSuffix: "%",   delta: "W1 + W2 webinar cohort",                            deltaDirection: "neutral", bar: 59 },
+  { label: "Outstanding Balance",value: "18,800", currency: "RM",   delta: "3 students · 4.6% of AR",                           deltaDirection: "neutral", bar: 14, barColor: "orange" },
+  { label: "Refund + Bad Debt",  value: "4,190",  currency: "RM",   delta: "1 W1 May no-show · 1.0%",                           deltaDirection: "neutral", bar: 6,  barColor: "red" },
 ];
 
 // === Revenue trend ===
@@ -28,7 +35,8 @@ export type RevenueMonth = {
   label: string;
   total: string;
   isCurrent?: boolean;
-  forecast?: string;
+  forecast?: number;       // RM total if this is current month forecast
+  totalRm: number;         // total revenue in RM (used for bar height calc)
   bars: {
     digital: number;
     coaching: number;
@@ -37,28 +45,26 @@ export type RevenueMonth = {
   };
 };
 
-// Heights (in SVG px) mirror the original SVG layout (chart canvas 320px tall).
-export const revenueMonths: RevenueMonth[] = [
-  {
-    label: "MAR 26",
-    total: "RM285K",
-    bars: { digital: 11, coaching: 18, corporate: 36, workshop: 106 },
-  },
-  {
-    label: "APR 26",
-    total: "RM352K",
-    bars: { digital: 17, coaching: 22, corporate: 43, workshop: 129 },
-  },
+// Full year through May 2026. Used by chart toggle: 3M/90D show last 3, YTD shows all.
+export const revenueAllMonths: RevenueMonth[] = [
+  { label: "JAN 26", total: "RM198K", totalRm: 198400, bars: { digital: 5400,  coaching: 28000, corporate: 35000, workshop: 130000 } },
+  { label: "FEB 26", total: "RM246K", totalRm: 245800, bars: { digital: 5800,  coaching: 25000, corporate: 53000, workshop: 162000 } },
+  { label: "MAR 26", total: "RM285K", totalRm: 285200, bars: { digital: 4800,  coaching: 15000, corporate: 35000, workshop: 230400 } },
+  { label: "APR 26", total: "RM352K", totalRm: 352000, bars: { digital: 5200,  coaching: 15000, corporate: 50000, workshop: 281800 } },
   {
     label: "MAY 26 · MTD",
-    total: "RM428K",
+    total: "RM152K",
     isCurrent: true,
-    forecast: "RM428K",
-    bars: { digital: 19, coaching: 25, corporate: 48, workshop: 148 },
+    forecast: 422800,
+    totalRm: 152400,
+    bars: { digital: 2000, coaching: 8000, corporate: 0, workshop: 142400 },
+    // workshop = 71,626 (W1 May earned) + 70,774 (deposits for W2/W3/W4/W1June recognized as cash) ≈ 142,400
   },
 ];
 
-// === Funnel ===
+export const targetMonthlyRm = 400000;
+
+// === Webinar Funnel (W1 + W2 May combined) ===
 export type FunnelStage = {
   label: string;
   count: string;
@@ -68,20 +74,24 @@ export type FunnelStage = {
   delta?: string;
 };
 
+// User-provided: LP views W1 7,273 + W2 5,166 = 12,439. Registered 648+736 = 1,384. Show-up 58.7%.
+// Attended = round(1,384 × 0.587) = 813. Enrolled = 20 (W1 sold out) + 15 (W2 currently) = 35.
 export const funnel: FunnelStage[] = [
-  { label: "Ad Impressions", count: "184,520", percent: "100%", bar: 100, delta: "▼ CTR 3.8%" },
-  { label: "Landing Page", count: "7,012", percent: "3.8%", bar: 72, delta: "▼ Opt-in 41%" },
-  { label: "Registered", count: "2,875", percent: "1.56%", bar: 58, delta: "▼ Show-up 78%" },
-  { label: "Attended", count: "2,242", percent: "1.21%", bar: 44, delta: "▼ Conversion 2.4%" },
-  { label: "Enrolled", count: "54", percent: "2.4%", bar: 14, highlight: true },
+  { label: "Ad Impressions", count: "412,500", percent: "100%",  bar: 100, delta: "▼ CTR 3.0%" },
+  { label: "Landing Page",   count: "12,439",  percent: "3.01%", bar: 68,  delta: "▼ Opt-in 11.1%" },
+  { label: "Registered",     count: "1,384",   percent: "0.34%", bar: 48,  delta: "▼ Show-up 58.7%" },
+  { label: "Attended",       count: "813",     percent: "0.20%", bar: 32,  delta: "▼ Conversion 4.3%" },
+  { label: "Enrolled",       count: "35",      percent: "4.3%",  bar: 14,  highlight: true },
 ];
 
 export const funnelStats = {
-  roas: "11.4",
-  adSpend: "RM 18,920",
+  // Revenue W1 (sold out 20/20): 71,626 + W2 (15/20 collected): 54,734 = 126,360
+  // Combined ad spend across W1 & W2 campaigns: 18,400
+  roas: "6.9",
+  adSpend: "RM 18,400",
 };
 
-// === Workshops ===
+// === Workshops (Class Registrations · next 8 cohorts) ===
 export type Workshop = {
   tag: string;
   tagType: "sold" | "corporate" | "upcoming" | "vip";
@@ -98,28 +108,28 @@ export type Workshop = {
 
 export const workshops: Workshop[] = [
   {
-    tag: "SOLD OUT",
-    tagType: "sold",
-    name: "Vibe Coding Intensive · W3 May",
-    date: "Sat–Sun · 17–18 May 2026 · KL HQ · waitlist 3",
-    seatsFilled: 12,
-    seatsTotal: 12,
-    progressPct: 100,
-    isFull: true,
-    revenue: "RM 48,964",
-    revenueNote: "collected",
-  },
-  {
     tag: "CORPORATE",
     tagType: "corporate",
-    name: "Koong Woh Tong · Private Vibe Coding",
-    date: "Thu · 15 May 2026 · client site · 1-day",
+    name: "KWT · Vibe Coding Corporate Training",
+    date: "Fri · 15 May 2026 · client site · 1-day",
     seatsFilled: 25,
     seatsTotal: 25,
     progressPct: 100,
     isFull: true,
     revenue: "RM 35,000",
     revenueNote: "50% deposit · paid",
+  },
+  {
+    tag: "SELLING OUT FAST",
+    tagType: "sold",
+    name: "Vibe Coding Intensive · W2 May",
+    date: "Sat–Sun · 16–17 May 2026 · KL HQ",
+    seatsFilled: 15,
+    seatsTotal: 20,
+    progressPct: 75,
+    isFull: false,
+    revenue: "RM 54,734",
+    revenueNote: "collected",
   },
   {
     tag: "CORPORATE",
@@ -135,27 +145,27 @@ export const workshops: Workshop[] = [
     revenueNote: "60% deposit · paid",
   },
   {
-    tag: "FILLING",
+    tag: "AVAILABLE",
     tagType: "upcoming",
-    name: "Vibe Coding Intensive · W4 May",
-    date: "Sat–Sun · 24–25 May 2026 · KL HQ",
+    name: "Vibe Coding Intensive · W3 May",
+    date: "Sat–Sun · 23–24 May 2026 · KL HQ",
     seatsFilled: 9,
-    seatsTotal: 12,
-    progressPct: 75,
+    seatsTotal: 20,
+    progressPct: 45,
     isFull: false,
-    revenue: "RM 35,973",
+    revenue: "RM 33,650",
     revenueNote: "collected",
   },
   {
-    tag: "EARLY BIRD",
-    tagType: "upcoming",
-    name: "Vibe Coding Intensive · W5 May",
-    date: "Sat · 31 May 2026 · KL HQ · 1-day intensive",
-    seatsFilled: 6,
-    seatsTotal: 12,
-    progressPct: 50,
+    tag: "SELLING OUT FAST",
+    tagType: "sold",
+    name: "Vibe Coding Intensive · W4 May",
+    date: "Sat–Sun · 27–28 May 2026 · KL HQ",
+    seatsFilled: 16,
+    seatsTotal: 20,
+    progressPct: 80,
     isFull: false,
-    revenue: "RM 17,982",
+    revenue: "RM 56,894",
     revenueNote: "collected",
   },
   {
@@ -164,10 +174,10 @@ export const workshops: Workshop[] = [
     name: "Vibe Coding Intensive · W1 June",
     date: "Sat–Sun · 7–8 June 2026 · KL HQ",
     seatsFilled: 4,
-    seatsTotal: 12,
-    progressPct: 33,
+    seatsTotal: 20,
+    progressPct: 20,
     isFull: false,
-    revenue: "RM 11,988",
+    revenue: "RM 14,730",
     revenueNote: "collected",
   },
   {
@@ -179,12 +189,12 @@ export const workshops: Workshop[] = [
     seatsTotal: 4,
     progressPct: 75,
     isFull: false,
-    revenue: "RM 29,991",
+    revenue: "RM 30,000",
     revenueNote: "collected",
   },
 ];
 
-// === Payments ===
+// === Payments (May 11–12, plus past days) ===
 export type Payment = {
   time: string;
   name: string;
@@ -194,23 +204,23 @@ export type Payment = {
 };
 
 export const payments: Payment[] = [
-  { time: "11:42", name: "Tan Mei Ling 陈美玲", note: "W3 May · standard", amount: "RM 3,997", status: "paid" },
-  { time: "10:18", name: "Ahmad Faizal Rahman", note: "VIP W4 May · 1:1 bundle", amount: "RM 7,997", status: "paid" },
-  { time: "09:55", name: "Wong Kah Yan 黄家燕", note: "W5 May · early bird", amount: "RM 2,997", status: "paid" },
-  { time: "09:14", name: "Priya Devi Subramaniam", note: "W4 May · standard", amount: "RM 3,997", status: "paid" },
-  { time: "08:32", name: "Marcus Tan Boon Hwa", note: "W1 June · early bird", amount: "RM 2,997", status: "paid" },
-  { time: "Yest", name: "Lim Wei Jian 林伟健", note: "W3 May · standard", amount: "RM 3,997", status: "paid" },
-  { time: "Yest", name: "Siti Nurhaliza Abdullah", note: "VIP W3 May · 1:1 bundle", amount: "RM 7,997", status: "paid" },
-  { time: "Yest", name: "Vincent Ng Chee Wei", note: "Corporate · FSI client", amount: "RM 34,000", status: "pending" },
-  { time: "10 May", name: "Lee Chee Wei 李志伟", note: "W4 May · standard", amount: "RM 3,997", status: "paid" },
-  { time: "10 May", name: "Nor Aisha Ibrahim", note: "1:1 Coaching · May intake", amount: "RM 9,997", status: "paid" },
-  { time: "10 May", name: "Raj Kumar Selvam", note: "W4 May · installment 1/2", amount: "RM 1,998", status: "partial" },
-  { time: "09 May", name: "Zulkifli Mahmud", note: "W3 May · standard", amount: "RM 3,997", status: "refund" },
-  { time: "09 May", name: "Khalid Bin Hassan", note: "W2 May · settled", amount: "RM 3,997", status: "paid" },
-  { time: "08 May", name: "Jessica Chua Hui Min", note: "VIP W4 May · 1:1 bundle", amount: "RM 7,997", status: "paid" },
+  { time: "11:42", name: "Tan Mei Ling 陈美玲",        note: "W3 May · solo",                    amount: "RM 4,190", status: "paid" },
+  { time: "10:18", name: "Ahmad Faizal Rahman",         note: "W2 May · pair (2 pax)",            amount: "RM 6,350", status: "paid" },
+  { time: "09:55", name: "Wong Kah Yan 黄家燕",         note: "W4 May · solo · early bird",       amount: "RM 4,190", status: "paid" },
+  { time: "09:14", name: "Priya Devi Subramaniam",      note: "W2 May · pair (2 pax)",            amount: "RM 6,350", status: "paid" },
+  { time: "08:32", name: "Marcus Tan Boon Hwa",         note: "W4 May · solo · early bird",       amount: "RM 4,190", status: "paid" },
+  { time: "Yest",  name: "Lim Wei Jian 林伟健",         note: "W2 May · solo",                    amount: "RM 4,190", status: "paid" },
+  { time: "Yest",  name: "Siti Nurhaliza Abdullah",     note: "W2 May · solo + 1:1 add-on",       amount: "RM 8,200", status: "paid" },
+  { time: "Yest",  name: "Vincent Ng Chee Wei",         note: "Corporate · FSI 40% balance",      amount: "RM 34,000",status: "pending" },
+  { time: "10 May",name: "Lee Chee Wei 李志伟",         note: "W3 May · solo",                    amount: "RM 4,190", status: "paid" },
+  { time: "10 May",name: "Nor Aisha Ibrahim",           note: "1:1 Coaching · May intake",        amount: "RM 10,000",status: "paid" },
+  { time: "10 May",name: "Raj Kumar Selvam",            note: "W3 May · pair · installment 1/2",  amount: "RM 3,175", status: "partial" },
+  { time: "09 May",name: "Zulkifli Mahmud",             note: "W1 May · no-show · refund",        amount: "RM 4,190", status: "refund" },
+  { time: "09 May",name: "Khalid Bin Hassan",           note: "W1 May · settled",                 amount: "RM 4,190", status: "paid" },
+  { time: "08 May",name: "Jessica Chua Hui Min",        note: "W2 May · solo + 1:1 add-on",       amount: "RM 8,200", status: "paid" },
 ];
 
-// === P&L ===
+// === P&L (accrual basis) ===
 export type PnlRow = {
   type: "header" | "line" | "subtotal" | "total";
   label: string;
@@ -223,120 +233,134 @@ export type PnlRow = {
 export const pnlColumns = ["Mar 2026", "Apr 2026", "May MTD", "May Forecast"];
 export const pnlPctHeader = "% of Rev";
 
+// May MTD accrual: only W1 May delivered (71,626). Other "collected" amounts are deferred revenue (unearned).
+// May Forecast: all 4 workshops + KWT + FSI delivered + coaching + digital = 422,800.
 export const pnlRows: PnlRow[] = [
   { type: "header", label: "Revenue" },
-  { type: "line", label: "Workshop tickets · standard + early bird", values: ["198,400", "241,800", "247,300", "268,900"], pctOfRev: "62.8%" },
-  { type: "line", label: "VIP track · workshop + 1:1 bundle",       values: ["32,000", "40,000", "40,000", "48,000"],    pctOfRev: "11.2%" },
-  { type: "line", label: "Corporate training engagements",          values: ["35,000", "50,000", "86,000", "86,000"],    pctOfRev: "20.1%" },
-  { type: "line", label: "1:1 coaching upgrades",                   values: ["15,000", "15,000", "20,000", "20,000"],    pctOfRev: "4.7%" },
-  { type: "line", label: "Digital products · templates, recordings",values: ["4,800", "5,200", "5,150", "5,500"],         pctOfRev: "1.3%" },
-  { type: "subtotal", label: "Gross Revenue",                       values: ["285,200", "352,000", "398,450", "428,400"], pctOfRev: "100.0%" },
+  { type: "line", label: "Workshop tickets · standard + early bird", values: ["198,400", "241,800", "71,626", "265,700"], pctOfRev: "62.8%" },
+  { type: "line", label: "VIP track · workshop + 1:1 bundle",        values: ["32,000",  "40,000",  "8,200",  "32,200"],  pctOfRev: "7.6%" },
+  { type: "line", label: "Corporate training engagements",           values: ["35,000",  "50,000",  "0",      "120,000"], pctOfRev: "28.4%" },
+  { type: "line", label: "1:1 coaching upgrades",                    values: ["15,000",  "15,000",  "8,000",  "27,500"],  pctOfRev: "6.5%" },
+  { type: "line", label: "Digital products · templates, recordings", values: ["4,800",   "5,200",   "2,000",  "5,400"],   pctOfRev: "1.3%" },
+  { type: "subtotal", label: "Gross Revenue",                        values: ["285,200", "352,000", "89,826", "422,800"], pctOfRev: "100.0%" },
 
   { type: "header", label: "Direct Costs · COGS" },
-  { type: "line", label: "Venue rental · KL HQ + corporate sites",  values: ["16,000", "20,000", "22,400", "24,000"],     pctOfRev: "5.6%" },
-  { type: "line", label: "F&B · coffee, lunch, snack pack",          values: ["4,800", "5,800", "6,400", "6,800"],         pctOfRev: "1.6%" },
-  { type: "line", label: "Assistant trainer fees · Jay + co-trainers", values: ["10,500", "13,000", "13,500", "15,000"],  pctOfRev: "3.5%" },
-  { type: "line", label: "Workbook printing + welcome kit",          values: ["2,400", "3,200", "3,350", "3,600"],         pctOfRev: "0.8%" },
-  { type: "line", label: "Photo / video crew · social proof content", values: ["4,500", "5,500", "6,000", "6,000"],        pctOfRev: "1.4%" },
-  { type: "subtotal", label: "Total COGS",                          values: ["38,200", "47,500", "51,650", "55,400"],     pctOfRev: "12.9%" },
+  { type: "line", label: "Venue rental · KL HQ + corporate sites",   values: ["16,000",  "20,000",  "5,400",  "23,200"], pctOfRev: "5.5%" },
+  { type: "line", label: "F&B · coffee, lunch, snack pack",          values: ["4,800",   "5,800",   "1,800",  "7,200"],  pctOfRev: "1.7%" },
+  { type: "line", label: "Assistant trainer fees · Jay + co-trainers", values: ["10,500", "13,000", "3,000",  "14,500"], pctOfRev: "3.4%" },
+  { type: "line", label: "Workbook printing + welcome kit",          values: ["2,400",   "3,200",   "850",    "3,600"],  pctOfRev: "0.9%" },
+  { type: "line", label: "Photo / video crew · social proof content",values: ["4,500",   "5,500",   "1,500",  "6,000"],  pctOfRev: "1.4%" },
+  { type: "subtotal", label: "Total COGS",                           values: ["38,200",  "47,500",  "12,550", "54,500"], pctOfRev: "12.9%" },
 
   { type: "header", label: "Marketing & Acquisition" },
-  { type: "line", label: "Meta + Google ad spend",                   values: ["48,000", "58,000", "62,500", "68,000"],     pctOfRev: "15.9%" },
-  { type: "line", label: "Affiliate & partner commissions · 10%",    values: ["18,400", "23,200", "26,800", "28,500"],     pctOfRev: "6.7%" },
-  { type: "line", label: "Webinar platform · WebinarX in-house",     values: ["0", "0", "0", "0"],                          pctOfRev: "0.0%" },
-  { type: "line", label: "Email + SMS · Resend, Mailgun, WhatsApp",  values: ["850", "950", "980", "1,000"],                pctOfRev: "0.2%" },
-  { type: "subtotal", label: "Total Marketing",                      values: ["67,250", "82,150", "90,280", "97,500"],      pctOfRev: "22.8%" },
+  { type: "line", label: "Meta + Google ad spend",                   values: ["48,000",  "58,000",  "18,400", "67,000"], pctOfRev: "15.8%" },
+  { type: "line", label: "Affiliate & partner commissions · 10%",    values: ["18,400",  "23,200",  "8,983",  "28,200"], pctOfRev: "6.7%" },
+  { type: "line", label: "Webinar platform · WebinarX in-house",     values: ["0",       "0",       "0",      "0"],      pctOfRev: "0.0%" },
+  { type: "line", label: "Email + SMS · Resend, Mailgun, WhatsApp",  values: ["850",     "950",     "320",    "1,050"],  pctOfRev: "0.2%" },
+  { type: "subtotal", label: "Total Marketing",                      values: ["67,250",  "82,150",  "27,703", "96,250"], pctOfRev: "22.8%" },
 
   { type: "header", label: "Operations & Software" },
-  { type: "line", label: "AI stack · Claude Max, Cursor, OpenAI, Replit", values: ["2,800", "3,200", "3,400", "3,500"],   pctOfRev: "0.8%" },
-  { type: "line", label: "Infra · Supabase, Vercel, Cloudflare R2, Mux",   values: ["1,200", "1,450", "1,520", "1,600"],   pctOfRev: "0.4%" },
-  { type: "line", label: "Payment processing · Stripe 3.0% + RM2",          values: ["8,560", "10,560", "11,950", "12,852"], pctOfRev: "3.0%" },
-  { type: "line", label: "Admin · transport, ops staff, contingency",       values: ["4,200", "4,800", "5,100", "5,500"],   pctOfRev: "1.3%" },
-  { type: "subtotal", label: "Total OpEx",                                  values: ["16,760", "20,010", "21,970", "23,452"], pctOfRev: "5.5%" },
+  { type: "line", label: "AI stack · Claude Max, Cursor, OpenAI, Replit", values: ["2,800", "3,200", "1,200",  "3,500"], pctOfRev: "0.8%" },
+  { type: "line", label: "Infra · Supabase, Vercel, Cloudflare R2, Mux",  values: ["1,200", "1,450", "580",    "1,600"], pctOfRev: "0.4%" },
+  { type: "line", label: "Payment processing · Stripe 3.0% + RM2",        values: ["8,560", "10,560","2,720",  "12,706"],pctOfRev: "3.0%" },
+  { type: "line", label: "Admin · transport, ops staff, contingency",     values: ["4,200", "4,800", "1,950",  "5,500"], pctOfRev: "1.3%" },
+  { type: "subtotal", label: "Total OpEx",                                values: ["16,760","20,010","6,450",  "23,306"],pctOfRev: "5.5%" },
 
   { type: "header", label: "Adjustments" },
-  { type: "line", label: "Refunds issued",       values: ["−2,997", "−3,997", "−3,997", "−4,000"], valuesClass: ["neg","neg","neg","neg"], pctOfRev: "0.9%" },
-  { type: "line", label: "Bad debt written off", values: ["0", "−1,200", "−1,200", "−1,500"],     valuesClass: ["neg","neg","neg","neg"], pctOfRev: "0.4%" },
+  { type: "line", label: "Refunds issued",       values: ["−2,997", "−3,997", "−4,190", "−4,200"], valuesClass: ["neg","neg","neg","neg"], pctOfRev: "1.0%" },
+  { type: "line", label: "Bad debt written off", values: ["0",      "−1,200", "0",      "−1,500"], valuesClass: ["neg","neg","neg","neg"], pctOfRev: "0.4%" },
 
-  { type: "total", label: "Net Profit", values: ["159,993", "197,143", "229,353", "246,548"], pctOfRev: "57.6%", pctClass: "pos" },
+  { type: "total", label: "Net Profit", values: ["159,993", "197,143", "38,933", "243,044"], pctOfRev: "57.5%", pctClass: "pos" },
 ];
 
-// === Unit Economics ===
+// === Per-workshop Unit Economics ===
+// Status types: "full" (greyed), "urgent" (red glow), "available" (green)
+export type UnitStatus = "full" | "urgent" | "available";
+
 export type Unit = {
   name: string;
   date: string;
+  seatsFilled: number;
+  seatsTotal: number;
+  status: UnitStatus;
+  statusLabel: string;
   rows: Array<{ label: string; value: string }>;
   marginLabel: string;
   margin: string;
 };
 
+// Per-workshop economics. Costs roughly stable per workshop regardless of seats sold.
+// Revenue shown at current seat count.
 export const units: Unit[] = [
   {
     name: "W1 May · completed",
-    date: "3–4 May · 12/12 seats",
+    date: "9–10 May · 20/20 seats",
+    seatsFilled: 20,
+    seatsTotal: 20,
+    status: "full",
+    statusLabel: "FULL",
     rows: [
-      { label: "Revenue", value: "49,964" },
-      { label: "Venue + F&B", value: "5,200" },
-      { label: "Asst trainer", value: "2,500" },
-      { label: "Ads (allocated)", value: "15,800" },
-      { label: "Other", value: "2,400" },
+      { label: "Revenue (actual)", value: "71,626" },
+      { label: "Venue + F&B",      value: "5,400" },
+      { label: "Asst trainer",     value: "3,000" },
+      { label: "Ads (allocated)",  value: "14,000" },
+      { label: "Other",            value: "2,800" },
     ],
     marginLabel: "Margin",
-    margin: "48%",
+    margin: "65%",
   },
   {
-    name: "W2 May · completed",
-    date: "10–11 May · 12/12 seats",
+    name: "W2 May · selling out",
+    date: "16–17 May · 15/20 seats",
+    seatsFilled: 15,
+    seatsTotal: 20,
+    status: "urgent",
+    statusLabel: "SELLING OUT FAST",
     rows: [
-      { label: "Revenue", value: "52,420" },
-      { label: "Venue + F&B", value: "5,200" },
-      { label: "Asst trainer", value: "2,500" },
-      { label: "Ads (allocated)", value: "14,200" },
-      { label: "Other", value: "2,400" },
+      { label: "Revenue (current)", value: "54,734" },
+      { label: "Venue + F&B",       value: "5,400" },
+      { label: "Asst trainer",      value: "3,000" },
+      { label: "Ads (allocated)",   value: "13,200" },
+      { label: "Other",             value: "2,800" },
     ],
-    marginLabel: "Margin",
-    margin: "53%",
+    marginLabel: "Margin (proj 20/20)",
+    margin: "65%",
   },
   {
-    name: "W3 May · sold out",
-    date: "17–18 May · 12/12 + WL 3",
+    name: "W3 May · available",
+    date: "23–24 May · 9/20 seats",
+    seatsFilled: 9,
+    seatsTotal: 20,
+    status: "available",
+    statusLabel: "AVAILABLE",
     rows: [
-      { label: "Revenue", value: "48,964" },
-      { label: "Venue + F&B", value: "5,400" },
-      { label: "Asst trainer", value: "2,500" },
-      { label: "Ads (allocated)", value: "11,900" },
-      { label: "Other", value: "2,400" },
+      { label: "Revenue (current)", value: "33,650" },
+      { label: "Venue + F&B",       value: "5,400" },
+      { label: "Asst trainer",      value: "3,000" },
+      { label: "Ads (allocated)",   value: "11,800" },
+      { label: "Other",             value: "2,800" },
     ],
-    marginLabel: "Margin",
-    margin: "54%",
+    marginLabel: "Margin (proj 20/20)",
+    margin: "65%",
   },
   {
-    name: "W4 May · filling",
-    date: "24–25 May · 9/12 seats",
+    name: "W4 May · selling out",
+    date: "27–28 May · 16/20 seats",
+    seatsFilled: 16,
+    seatsTotal: 20,
+    status: "urgent",
+    statusLabel: "SELLING OUT FAST",
     rows: [
-      { label: "Revenue (proj)", value: "47,964" },
-      { label: "Venue + F&B", value: "5,400" },
-      { label: "Asst trainer", value: "2,500" },
-      { label: "Ads (allocated)", value: "10,800" },
-      { label: "Other", value: "2,400" },
+      { label: "Revenue (current)", value: "56,894" },
+      { label: "Venue + F&B",       value: "5,400" },
+      { label: "Asst trainer",      value: "3,000" },
+      { label: "Ads (allocated)",   value: "12,400" },
+      { label: "Other",             value: "2,800" },
     ],
-    marginLabel: "Margin (proj)",
-    margin: "56%",
-  },
-  {
-    name: "FSI Corporate · 2-day",
-    date: "20–21 May · 25 attendees",
-    rows: [
-      { label: "Revenue", value: "85,000" },
-      { label: "Venue (client)", value: "0" },
-      { label: "Asst trainer", value: "5,000" },
-      { label: "Travel + ops", value: "3,800" },
-      { label: "Materials", value: "1,800" },
-    ],
-    marginLabel: "Margin",
-    margin: "87%",
+    marginLabel: "Margin (proj 20/20)",
+    margin: "66%",
   },
 ];
 
-// === Random "live" payment bump amounts (used by KPI revenue ticker) ===
-export const liveBumpAmounts = [2997, 3997, 7997, 2997, 9997];
+// === Live revenue ticker bump amounts (per real pricing tiers) ===
+export const liveBumpAmounts = [4190, 6350, 4190, 8200, 2160];

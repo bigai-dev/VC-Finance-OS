@@ -1,11 +1,43 @@
-import { revenueMonths } from "@/lib/mock-data";
+"use client";
 
-// SVG faithfully ports the original chart - 3 monthly stacked bar groups
-// at x=180, 450, 720 within a 900x320 viewBox.
+import { useState, useMemo } from "react";
+import { revenueAllMonths, targetMonthlyRm, type RevenueMonth } from "@/lib/mock-data";
+
+type Range = "3M" | "90D" | "YTD";
+
+// SVG layout constants
+const SVG_W = 900;
+const SVG_H = 360;
+const CHART_TOP = 40;       // y of 500K mark
+const CHART_BOTTOM = 320;   // y of 0 baseline
+const CHART_LEFT = 60;
+const CHART_RIGHT = 880;
+const MAX_RM = 500_000;     // top of scale
+
+// rm -> y
+function yFor(rm: number): number {
+  const range = CHART_BOTTOM - CHART_TOP;
+  return CHART_BOTTOM - (rm / MAX_RM) * range;
+}
+
+const GRID_TICKS = [100_000, 200_000, 300_000, 400_000, 500_000];
+
 export function RevenueTrendChart() {
-  const groups = [180, 450, 720];
-  // Heights stack from y=280 (baseline) upward.
-  // Stack order (bottom to top): digital, coaching, corporate, workshop.
+  const [range, setRange] = useState<Range>("90D");
+
+  const months = useMemo<RevenueMonth[]>(() => {
+    if (range === "YTD") return revenueAllMonths;
+    return revenueAllMonths.slice(-3);
+  }, [range]);
+
+  // Lay out groups evenly across the chart area.
+  const groupCount = months.length;
+  const chartInnerW = CHART_RIGHT - CHART_LEFT;
+  const spacing = chartInnerW / (groupCount + 0.5);
+  const barW = Math.min(110, spacing * 0.65);
+  const positions = months.map((_, i) => CHART_LEFT + spacing * (i + 0.75));
+
+  const targetY = yFor(targetMonthlyRm);
 
   return (
     <div className="card">
@@ -14,9 +46,16 @@ export function RevenueTrendChart() {
           Monthly Revenue <small>· by stream</small>
         </div>
         <div className="card-actions">
-          <span className="chip">3M</span>
-          <span className="chip active">90D</span>
-          <span className="chip">YTD</span>
+          {(["3M", "90D", "YTD"] as Range[]).map((r) => (
+            <button
+              key={r}
+              type="button"
+              className={`chip${range === r ? " active" : ""}`}
+              onClick={() => setRange(r)}
+            >
+              {r}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -26,7 +65,7 @@ export function RevenueTrendChart() {
           Workshop Tickets
         </span>
         <span className="legend-item">
-          <span className="legend-swatch" style={{ background: "#4A66A8" }} />
+          <span className="legend-swatch" style={{ background: "var(--navy-bright)" }} />
           Corporate Training
         </span>
         <span className="legend-item">
@@ -34,7 +73,7 @@ export function RevenueTrendChart() {
           1:1 Coaching
         </span>
         <span className="legend-item">
-          <span className="legend-swatch" style={{ background: "#666" }} />
+          <span className="legend-swatch" style={{ background: "#888" }} />
           Digital Products
         </span>
         <span className="legend-item" style={{ marginLeft: "auto", color: "var(--text-dim)" }}>
@@ -42,85 +81,149 @@ export function RevenueTrendChart() {
             className="legend-swatch"
             style={{ background: "transparent", border: "1px dashed var(--gold)" }}
           />
-          Target RM400K
+          Target RM 400K
         </span>
       </div>
 
       <div className="chart-wrap">
-        <svg viewBox="0 0 900 320" width="100%" preserveAspectRatio="none" style={{ display: "block" }}>
+        <svg
+          viewBox={`0 0 ${SVG_W} ${SVG_H}`}
+          width="100%"
+          preserveAspectRatio="none"
+          style={{ display: "block" }}
+        >
           {/* horizontal grid */}
-          <g stroke="#1a1a1a" strokeWidth="1">
-            <line x1="60" y1="40" x2="880" y2="40" />
-            <line x1="60" y1="100" x2="880" y2="100" />
-            <line x1="60" y1="160" x2="880" y2="160" />
-            <line x1="60" y1="220" x2="880" y2="220" />
-            <line x1="60" y1="280" x2="880" y2="280" />
+          <g stroke="var(--border)" strokeWidth="1">
+            {GRID_TICKS.map((rm) => (
+              <line key={rm} x1={CHART_LEFT} y1={yFor(rm)} x2={CHART_RIGHT} y2={yFor(rm)} />
+            ))}
           </g>
+
           {/* y axis labels */}
-          <g fill="#555" fontFamily="JetBrains Mono" fontSize="10" textAnchor="end">
-            <text x="50" y="44">500K</text>
-            <text x="50" y="104">400K</text>
-            <text x="50" y="164">300K</text>
-            <text x="50" y="224">200K</text>
-            <text x="50" y="284">100K</text>
+          <g
+            fill="var(--text-dim)"
+            fontFamily="var(--font-mono), JetBrains Mono, monospace"
+            fontSize="10"
+            textAnchor="end"
+            fontWeight="600"
+          >
+            {GRID_TICKS.map((rm) => (
+              <text key={rm} x={CHART_LEFT - 8} y={yFor(rm) + 4}>
+                {Math.round(rm / 1000)}K
+              </text>
+            ))}
           </g>
-          {/* target line at 400K (y=100) */}
-          <line x1="60" y1="100" x2="880" y2="100" stroke="#EAB308" strokeWidth="1" strokeDasharray="4,4" opacity="0.5" />
-          <text x="870" y="92" fill="#EAB308" fontFamily="JetBrains Mono" fontSize="9" textAnchor="end" opacity="0.8">
+
+          {/* target line at RM 400K */}
+          <line
+            x1={CHART_LEFT}
+            y1={targetY}
+            x2={CHART_RIGHT}
+            y2={targetY}
+            stroke="var(--gold)"
+            strokeWidth="1.2"
+            strokeDasharray="5,4"
+            opacity="0.7"
+          />
+          <text
+            x={CHART_RIGHT - 6}
+            y={targetY - 6}
+            fill="var(--gold)"
+            fontFamily="var(--font-mono), JetBrains Mono, monospace"
+            fontSize="10"
+            textAnchor="end"
+            opacity="0.85"
+            fontWeight="700"
+          >
             TARGET 400K
           </text>
 
-          {revenueMonths.map((m, idx) => {
-            const x = groups[idx];
+          {months.map((m, i) => {
+            const x = positions[i];
+            const halfW = barW / 2;
             const { digital, coaching, corporate, workshop } = m.bars;
-            // Heights from data; baseline y=280.
-            const yDigital = 280 - digital;
-            const yCoaching = yDigital - coaching;
-            const yCorporate = yCoaching - corporate;
-            const yWorkshop = yCorporate - workshop;
-            const totalY = yWorkshop - 11;
+            const baseline = CHART_BOTTOM;
+
+            const yDigitalTop  = baseline - digital / (MAX_RM / (CHART_BOTTOM - CHART_TOP));
+            const yCoachingTop = yDigitalTop - coaching / (MAX_RM / (CHART_BOTTOM - CHART_TOP));
+            const yCorpTop     = yCoachingTop - corporate / (MAX_RM / (CHART_BOTTOM - CHART_TOP));
+            const yWorkshopTop = yCorpTop - workshop / (MAX_RM / (CHART_BOTTOM - CHART_TOP));
+
+            const hDigital  = baseline - yDigitalTop;
+            const hCoaching = yDigitalTop - yCoachingTop;
+            const hCorp     = yCoachingTop - yCorpTop;
+            const hWorkshop = yCorpTop - yWorkshopTop;
+
             const isMtd = m.isCurrent === true;
+            const forecastY = isMtd && m.forecast ? yFor(m.forecast) : null;
+            const totalLabelY = yWorkshopTop - 8;
 
             return (
-              <g key={m.label} transform={`translate(${x}, 0)`}>
-                <rect x="-50" y={yDigital} width="100" height={digital} fill="#666" />
-                <rect x="-50" y={yCoaching} width="100" height={coaching} fill="#4dd0ff" />
-                <rect x="-50" y={yCorporate} width="100" height={corporate} fill="#4A66A8" />
-                <rect x="-50" y={yWorkshop} width="100" height={workshop} fill="#EAB308" />
+              <g key={m.label}>
+                {/* digital */}
+                <rect x={x - halfW} y={yDigitalTop} width={barW} height={hDigital} fill="#888" />
+                {/* coaching */}
+                <rect x={x - halfW} y={yCoachingTop} width={barW} height={hCoaching} fill="var(--blue)" />
+                {/* corporate */}
+                <rect x={x - halfW} y={yCorpTop} width={barW} height={hCorp} fill="var(--navy-bright)" />
+                {/* workshop */}
+                <rect x={x - halfW} y={yWorkshopTop} width={barW} height={hWorkshop} fill="var(--gold)" />
 
-                {isMtd && (
+                {/* forecast ghost */}
+                {forecastY !== null && (
                   <rect
-                    x="-50"
-                    y={yWorkshop - 20}
-                    width="100"
-                    height="20"
-                    fill="#EAB308"
-                    opacity="0.25"
-                    stroke="#EAB308"
+                    x={x - halfW}
+                    y={forecastY}
+                    width={barW}
+                    height={yWorkshopTop - forecastY}
+                    fill="var(--gold)"
+                    opacity="0.22"
+                    stroke="var(--gold)"
                     strokeDasharray="3,3"
                     strokeWidth="1"
                   />
                 )}
 
+                {/* total label */}
                 <text
-                  x="0"
-                  y={isMtd ? totalY - 3 : totalY}
-                  fill={isMtd ? "#EAB308" : "#fff"}
-                  fontFamily="Instrument Serif"
-                  fontSize={isMtd ? 20 : 18}
+                  x={x}
+                  y={isMtd && forecastY !== null ? forecastY - 8 : totalLabelY}
+                  fill={isMtd ? "var(--gold)" : "var(--text)"}
+                  fontFamily="var(--font-sans), Inter, system-ui, sans-serif"
+                  fontSize="18"
+                  fontWeight="700"
                   textAnchor="middle"
-                  fontStyle={isMtd ? "italic" : "normal"}
+                  letterSpacing="-0.3"
                 >
                   {m.total}
                 </text>
+
+                {/* forecast label inline */}
+                {isMtd && m.forecast !== undefined && (
+                  <text
+                    x={x}
+                    y={totalLabelY}
+                    fill="var(--text-mid)"
+                    fontFamily="var(--font-mono), JetBrains Mono, monospace"
+                    fontSize="10"
+                    textAnchor="middle"
+                    letterSpacing="1"
+                    fontWeight="600"
+                  >
+                    fcst {Math.round(m.forecast / 1000)}K
+                  </text>
+                )}
+
+                {/* x axis label */}
                 <text
-                  x="0"
-                  y="305"
-                  fill={isMtd ? "#EAB308" : "#9a9a9a"}
-                  fontFamily="JetBrains Mono"
-                  fontSize="10"
+                  x={x}
+                  y={CHART_BOTTOM + 28}
+                  fill={isMtd ? "var(--gold)" : "var(--text-mid)"}
+                  fontFamily="var(--font-mono), JetBrains Mono, monospace"
+                  fontSize="11"
                   textAnchor="middle"
-                  letterSpacing="2"
+                  letterSpacing="1.5"
+                  fontWeight="700"
                 >
                   {m.label}
                 </text>
@@ -128,11 +231,20 @@ export function RevenueTrendChart() {
             );
           })}
 
-          <g opacity="0.7">
-            <text x="820" y="32" fill="#EAB308" fontFamily="JetBrains Mono" fontSize="9" textAnchor="end">
+          {months.some((m) => m.isCurrent) && (
+            <text
+              x={CHART_RIGHT - 6}
+              y={CHART_TOP - 8}
+              fill="var(--gold)"
+              fontFamily="var(--font-mono), JetBrains Mono, monospace"
+              fontSize="10"
+              textAnchor="end"
+              opacity="0.75"
+              fontWeight="700"
+            >
               FORECAST →
             </text>
-          </g>
+          )}
         </svg>
       </div>
     </div>

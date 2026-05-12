@@ -5,7 +5,7 @@ export function Funnel() {
     <div className="card">
       <div className="card-head">
         <div className="card-title">
-          Webinar Funnel <small>· W3 May cohort</small>
+          Webinar Funnel <small>· W1 + W2 May combined</small>
         </div>
         <span className="chip active">LIVE</span>
       </div>
@@ -14,7 +14,7 @@ export function Funnel() {
         {funnel.map((stage, i) => {
           const barStyle: React.CSSProperties = { width: `${stage.bar}%` };
           if (stage.highlight) {
-            barStyle.background = "linear-gradient(90deg, #00ff9d, rgba(0,255,157,0.4))";
+            barStyle.background = "linear-gradient(90deg, var(--green), rgba(0,255,157,0.4))";
             barStyle.color = "#000";
           }
           return (
@@ -26,7 +26,10 @@ export function Funnel() {
                     {stage.count}
                   </div>
                 </div>
-                <div className="funnel-pct" style={stage.highlight ? { color: "var(--green)" } : undefined}>
+                <div
+                  className="funnel-pct"
+                  style={stage.highlight ? { color: "var(--green)" } : undefined}
+                >
                   {stage.percent}
                 </div>
               </div>
@@ -37,62 +40,17 @@ export function Funnel() {
           );
         })}
 
-        <div
-          style={{
-            marginTop: 16,
-            paddingTop: 14,
-            borderTop: "1px solid var(--border)",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "baseline",
-          }}
-        >
+        <div className="funnel-summary">
           <div>
-            <div
-              style={{
-                fontSize: "11.5px",
-                color: "var(--text-mid)",
-                letterSpacing: "1.5px",
-                textTransform: "uppercase",
-                fontWeight: 600,
-              }}
-            >
-              Cohort ROAS
-            </div>
-            <div
-              style={{
-                fontFamily: "var(--font-serif), Georgia, serif",
-                fontSize: 34,
-                color: "var(--gold)",
-                letterSpacing: "-0.5px",
-              }}
-            >
+            <div className="funnel-summary-label">Cohort ROAS</div>
+            <div className="funnel-summary-value">
               {funnelStats.roas}
-              <span style={{ fontSize: 17, color: "var(--text-mid)" }}>x</span>
+              <small>x</small>
             </div>
           </div>
           <div style={{ textAlign: "right" }}>
-            <div
-              style={{
-                fontSize: "11.5px",
-                color: "var(--text-mid)",
-                letterSpacing: "1.5px",
-                textTransform: "uppercase",
-                fontWeight: 600,
-              }}
-            >
-              Ad Spend
-            </div>
-            <div
-              style={{
-                fontFamily: "var(--font-serif), Georgia, serif",
-                fontSize: 24,
-                color: "var(--text)",
-                letterSpacing: "-0.3px",
-              }}
-            >
-              {funnelStats.adSpend}
-            </div>
+            <div className="funnel-summary-label">Ad Spend</div>
+            <div className="funnel-summary-value plain">{funnelStats.adSpend}</div>
           </div>
         </div>
       </div>
