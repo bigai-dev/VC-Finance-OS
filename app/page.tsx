@@ -20,7 +20,7 @@ export default function Home() {
       />
       <KpiGrid />
 
-      <SectionLabel label="Revenue Trend · 90-day rolling" meta="Mar · Apr · May 2026" />
+      <SectionLabel label="Revenue Trend" meta="Workshop · corporate · 1:1 coaching · digital" />
       <div className="row row-7-3">
         <RevenueTrendChart />
         <Funnel />
@@ -37,10 +37,7 @@ export default function Home() {
         <PnlTable />
       </div>
 
-      <SectionLabel
-        label="Per-Workshop Unit Economics · May 2026"
-        meta="Solo RM 3,880 + 8% SST · Pair RM 5,880 + 8% SST · 20-seat cap"
-      />
+      <SectionLabel label="Per-Workshop Unit Economics · May 2026" />
       <div className="row row-1">
         <UnitEconomics />
       </div>

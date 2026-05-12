@@ -45,8 +45,8 @@ export function Header() {
         <span className="clock">{clock}</span>
         <ThemeToggle />
         <div className="user-chip">
-          <div className="user-avatar">N</div>
-          <span>Nick Lo</span>
+          <div className="user-avatar">J</div>
+          <span>Jay Te</span>
         </div>
       </div>
     </header>

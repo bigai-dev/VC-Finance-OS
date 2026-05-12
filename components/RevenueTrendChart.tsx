@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import { revenueAllMonths, targetMonthlyRm, type RevenueMonth } from "@/lib/mock-data";
 
-type Range = "3M" | "90D" | "YTD";
+type Range = "30D" | "90D" | "YTD";
 
 // SVG layout constants
 const SVG_W = 900;
@@ -27,6 +27,7 @@ export function RevenueTrendChart() {
 
   const months = useMemo<RevenueMonth[]>(() => {
     if (range === "YTD") return revenueAllMonths;
+    if (range === "30D") return revenueAllMonths.slice(-1);
     return revenueAllMonths.slice(-3);
   }, [range]);
 
@@ -46,7 +47,7 @@ export function RevenueTrendChart() {
           Monthly Revenue <small>· by stream</small>
         </div>
         <div className="card-actions">
-          {(["3M", "90D", "YTD"] as Range[]).map((r) => (
+          {(["30D", "90D", "YTD"] as Range[]).map((r) => (
             <button
               key={r}
               type="button"

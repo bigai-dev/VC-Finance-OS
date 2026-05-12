@@ -91,10 +91,11 @@ export const funnelStats = {
   adSpend: "RM 18,400",
 };
 
-// === Workshops (Class Registrations · next 8 cohorts) ===
+// === Workshops (Class Registrations · Upcoming + Completed) ===
 export type Workshop = {
   tag: string;
-  tagType: "sold" | "corporate" | "upcoming" | "vip";
+  tagType: "sold" | "corporate" | "upcoming" | "vip" | "done";
+  completionStatus: "upcoming" | "completed";
   name: string;
   date: string;
   seatsFilled: number;
@@ -107,9 +108,11 @@ export type Workshop = {
 };
 
 export const workshops: Workshop[] = [
+  // === UPCOMING ===
   {
     tag: "CORPORATE",
     tagType: "corporate",
+    completionStatus: "upcoming",
     name: "KWT · Vibe Coding Corporate Training",
     date: "Fri · 15 May 2026 · client site · 1-day",
     seatsFilled: 25,
@@ -122,6 +125,7 @@ export const workshops: Workshop[] = [
   {
     tag: "SELLING OUT FAST",
     tagType: "sold",
+    completionStatus: "upcoming",
     name: "Vibe Coding Intensive · W2 May",
     date: "Sat–Sun · 16–17 May 2026 · KL HQ",
     seatsFilled: 15,
@@ -134,6 +138,7 @@ export const workshops: Workshop[] = [
   {
     tag: "CORPORATE",
     tagType: "corporate",
+    completionStatus: "upcoming",
     name: "Confidential FSI Client · 2-day automation",
     date: "Tue–Wed · 20–21 May 2026 · KLCC · Claude Cowork",
     seatsFilled: 0,
@@ -147,6 +152,7 @@ export const workshops: Workshop[] = [
   {
     tag: "AVAILABLE",
     tagType: "upcoming",
+    completionStatus: "upcoming",
     name: "Vibe Coding Intensive · W3 May",
     date: "Sat–Sun · 23–24 May 2026 · KL HQ",
     seatsFilled: 9,
@@ -159,6 +165,7 @@ export const workshops: Workshop[] = [
   {
     tag: "SELLING OUT FAST",
     tagType: "sold",
+    completionStatus: "upcoming",
     name: "Vibe Coding Intensive · W4 May",
     date: "Sat–Sun · 27–28 May 2026 · KL HQ",
     seatsFilled: 16,
@@ -171,6 +178,7 @@ export const workshops: Workshop[] = [
   {
     tag: "EARLY BIRD",
     tagType: "upcoming",
+    completionStatus: "upcoming",
     name: "Vibe Coding Intensive · W1 June",
     date: "Sat–Sun · 7–8 June 2026 · KL HQ",
     seatsFilled: 4,
@@ -183,6 +191,7 @@ export const workshops: Workshop[] = [
   {
     tag: "VIP TRACK",
     tagType: "vip",
+    completionStatus: "upcoming",
     name: "1:1 Coaching · May intake",
     date: "Rolling · 8 sessions · custom schedule",
     seatsFilled: 3,
@@ -191,6 +200,73 @@ export const workshops: Workshop[] = [
     isFull: false,
     revenue: "RM 30,000",
     revenueNote: "collected",
+  },
+
+  // === COMPLETED ===
+  {
+    tag: "COMPLETED",
+    tagType: "done",
+    completionStatus: "completed",
+    name: "Vibe Coding Intensive · W1 May",
+    date: "Fri–Sat · 9–10 May 2026 · KL HQ",
+    seatsFilled: 20,
+    seatsTotal: 20,
+    progressPct: 100,
+    isFull: true,
+    revenue: "RM 71,626",
+    revenueNote: "delivered · 100% collected",
+  },
+  {
+    tag: "COMPLETED",
+    tagType: "done",
+    completionStatus: "completed",
+    name: "Vibe Coding Intensive · W4 April",
+    date: "Sat–Sun · 26–27 Apr 2026 · KL HQ",
+    seatsFilled: 19,
+    seatsTotal: 20,
+    progressPct: 95,
+    isFull: false,
+    revenue: "RM 67,520",
+    revenueNote: "delivered · NPS 84",
+  },
+  {
+    tag: "CORPORATE · DONE",
+    tagType: "done",
+    completionStatus: "completed",
+    name: "PETRONAS · GenAI Pilot Workshop",
+    date: "Wed · 23 Apr 2026 · client site · 1-day",
+    seatsFilled: 30,
+    seatsTotal: 30,
+    progressPct: 100,
+    isFull: true,
+    revenue: "RM 42,000",
+    revenueNote: "invoice settled",
+  },
+  {
+    tag: "COMPLETED",
+    tagType: "done",
+    completionStatus: "completed",
+    name: "Vibe Coding Intensive · W3 April",
+    date: "Sat–Sun · 19–20 Apr 2026 · KL HQ",
+    seatsFilled: 20,
+    seatsTotal: 20,
+    progressPct: 100,
+    isFull: true,
+    revenue: "RM 71,200",
+    revenueNote: "delivered · waitlist 5",
+  },
+  {
+    tag: "COMPLETED",
+    tagType: "done",
+    completionStatus: "completed",
+    name: "Vibe Coding Intensive · W2 April",
+    date: "Sat–Sun · 12–13 Apr 2026 · KL HQ",
+    seatsFilled: 16,
+    seatsTotal: 20,
+    progressPct: 80,
+    isFull: false,
+    revenue: "RM 56,800",
+    revenueNote: "delivered · 80% capacity",
   },
 ];
 
@@ -203,21 +279,41 @@ export type Payment = {
   status: "paid" | "pending" | "refund" | "partial";
 };
 
+// Spread realistically across May 12 (today, now 19:34 MYT) through May 8.
+// Newest first.
 export const payments: Payment[] = [
-  { time: "11:42", name: "Tan Mei Ling 陈美玲",        note: "W3 May · solo",                    amount: "RM 4,190", status: "paid" },
-  { time: "10:18", name: "Ahmad Faizal Rahman",         note: "W2 May · pair (2 pax)",            amount: "RM 6,350", status: "paid" },
-  { time: "09:55", name: "Wong Kah Yan 黄家燕",         note: "W4 May · solo · early bird",       amount: "RM 4,190", status: "paid" },
-  { time: "09:14", name: "Priya Devi Subramaniam",      note: "W2 May · pair (2 pax)",            amount: "RM 6,350", status: "paid" },
-  { time: "08:32", name: "Marcus Tan Boon Hwa",         note: "W4 May · solo · early bird",       amount: "RM 4,190", status: "paid" },
-  { time: "Yest",  name: "Lim Wei Jian 林伟健",         note: "W2 May · solo",                    amount: "RM 4,190", status: "paid" },
-  { time: "Yest",  name: "Siti Nurhaliza Abdullah",     note: "W2 May · solo + 1:1 add-on",       amount: "RM 8,200", status: "paid" },
-  { time: "Yest",  name: "Vincent Ng Chee Wei",         note: "Corporate · FSI 40% balance",      amount: "RM 34,000",status: "pending" },
-  { time: "10 May",name: "Lee Chee Wei 李志伟",         note: "W3 May · solo",                    amount: "RM 4,190", status: "paid" },
-  { time: "10 May",name: "Nor Aisha Ibrahim",           note: "1:1 Coaching · May intake",        amount: "RM 10,000",status: "paid" },
-  { time: "10 May",name: "Raj Kumar Selvam",            note: "W3 May · pair · installment 1/2",  amount: "RM 3,175", status: "partial" },
-  { time: "09 May",name: "Zulkifli Mahmud",             note: "W1 May · no-show · refund",        amount: "RM 4,190", status: "refund" },
-  { time: "09 May",name: "Khalid Bin Hassan",           note: "W1 May · settled",                 amount: "RM 4,190", status: "paid" },
-  { time: "08 May",name: "Jessica Chua Hui Min",        note: "W2 May · solo + 1:1 add-on",       amount: "RM 8,200", status: "paid" },
+  // Today, May 12
+  { time: "19:14", name: "Chong Yi Ling 张依玲",         note: "W4 May · solo",                    amount: "RM 4,190", status: "paid" },
+  { time: "18:42", name: "Daniel Wong Heng Kiat",         note: "W4 May · solo",                    amount: "RM 4,190", status: "paid" },
+  { time: "17:05", name: "Hafiz Bin Daud",                note: "W2 May · pair (2 pax)",            amount: "RM 6,350", status: "paid" },
+  { time: "15:48", name: "Aaron Lim Jia Wei",             note: "W3 May · solo",                    amount: "RM 4,190", status: "paid" },
+  { time: "14:22", name: "Sharifah Aisyah Putri",         note: "1:1 Coaching · June intake",       amount: "RM 10,000",status: "paid" },
+  { time: "13:08", name: "Yong Kar Mun 杨家文",          note: "W4 May · solo · early bird",       amount: "RM 4,190", status: "paid" },
+  { time: "11:42", name: "Tan Mei Ling 陈美玲",          note: "W3 May · solo",                    amount: "RM 4,190", status: "paid" },
+  { time: "10:18", name: "Ahmad Faizal Rahman",           note: "W2 May · pair (2 pax)",            amount: "RM 6,350", status: "paid" },
+  { time: "09:55", name: "Wong Kah Yan 黄家燕",          note: "W4 May · solo · early bird",       amount: "RM 4,190", status: "paid" },
+  { time: "08:32", name: "Marcus Tan Boon Hwa",           note: "W4 May · solo · early bird",       amount: "RM 4,190", status: "paid" },
+  { time: "06:50", name: "Kavitha Maniam",                note: "W1 June · solo · early bird",      amount: "RM 4,190", status: "paid" },
+
+  // Yesterday, May 11
+  { time: "Yest",  name: "James Tan Chin Hock",           note: "W4 May · solo",                    amount: "RM 4,190", status: "paid" },
+  { time: "Yest",  name: "Lim Wei Jian 林伟健",          note: "W2 May · solo",                    amount: "RM 4,190", status: "paid" },
+  { time: "Yest",  name: "Priya Devi Subramaniam",        note: "W2 May · pair (2 pax)",            amount: "RM 6,350", status: "paid" },
+  { time: "Yest",  name: "Siti Nurhaliza Abdullah",       note: "W2 May · solo + 1:1 add-on",       amount: "RM 8,200", status: "paid" },
+  { time: "Yest",  name: "Vincent Ng Chee Wei",           note: "Corporate · FSI 40% balance",      amount: "RM 34,000",status: "pending" },
+
+  // May 10
+  { time: "10 May",name: "Mahaveer Singh",                note: "W3 May · solo",                    amount: "RM 4,190", status: "paid" },
+  { time: "10 May",name: "Lee Chee Wei 李志伟",          note: "W3 May · solo",                    amount: "RM 4,190", status: "paid" },
+  { time: "10 May",name: "Nor Aisha Ibrahim",             note: "1:1 Coaching · May intake",        amount: "RM 10,000",status: "paid" },
+  { time: "10 May",name: "Raj Kumar Selvam",              note: "W3 May · pair · installment 1/2",  amount: "RM 3,175", status: "partial" },
+
+  // May 9 (W1 May workshop day)
+  { time: "09 May",name: "Zulkifli Mahmud",               note: "W1 May · no-show · refund",        amount: "RM 4,190", status: "refund" },
+  { time: "09 May",name: "Khalid Bin Hassan",             note: "W1 May · settled · pair add-on",   amount: "RM 2,160", status: "paid" },
+
+  // May 8
+  { time: "08 May",name: "Jessica Chua Hui Min",          note: "W2 May · solo + 1:1 add-on",       amount: "RM 8,200", status: "paid" },
 ];
 
 // === P&L (accrual basis) ===
