@@ -7,7 +7,7 @@ export function PaymentStream() {
         <div className="card-title">
           Payment Stream <small>· last 24h</small>
         </div>
-        <span className="chip active">● LIVE</span>
+        <span className="live-tag">Live</span>
       </div>
       <div className="payment-list">
         {payments.map((p, i) => (

@@ -5,15 +5,15 @@ import { useEffect, useState } from "react";
 type Theme = "dark" | "light";
 
 function readInitial(): Theme {
-  if (typeof window === "undefined") return "dark";
+  if (typeof window === "undefined") return "light";
   const v = document.documentElement.getAttribute("data-theme");
-  return v === "light" ? "light" : "dark";
+  return v === "dark" ? "dark" : "light";
 }
 
 export function ThemeToggle() {
   // Render with the value already applied to <html> by the inline boot script.
   // This prevents a flash of the wrong icon on first paint.
-  const [theme, setTheme] = useState<Theme>("dark");
+  const [theme, setTheme] = useState<Theme>("light");
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -39,7 +39,7 @@ export function ThemeToggle() {
       title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
       suppressHydrationWarning
     >
-      {!mounted || theme === "dark" ? (
+      {mounted && theme === "dark" ? (
         // sun icon (visible in dark mode)
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <circle cx="12" cy="12" r="4" />

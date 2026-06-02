@@ -7,7 +7,6 @@ import { Workshops } from "@/components/Workshops";
 import { PaymentStream } from "@/components/PaymentStream";
 import { PnlTable } from "@/components/PnlTable";
 import { UnitEconomics } from "@/components/UnitEconomics";
-import { Footer } from "@/components/Footer";
 
 export default function Home() {
   return (
@@ -41,8 +40,6 @@ export default function Home() {
       <div className="row row-1">
         <UnitEconomics />
       </div>
-
-      <Footer />
     </div>
   );
 }

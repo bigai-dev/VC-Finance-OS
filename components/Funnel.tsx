@@ -7,7 +7,7 @@ export function Funnel() {
         <div className="card-title">
           Webinar Funnel <small>· W1 + W2 May combined</small>
         </div>
-        <span className="chip active">LIVE</span>
+        <span className="live-tag">Live</span>
       </div>
 
       <div className="funnel">

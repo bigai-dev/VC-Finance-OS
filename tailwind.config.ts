@@ -16,7 +16,6 @@ const config: Config = {
         "border-hi": "var(--border-hi)",
         gold: "var(--gold)",
         "gold-dim": "var(--gold-dim)",
-        "gold-glow": "var(--gold-glow)",
         text: "var(--text)",
         "text-mid": "var(--text-mid)",
         "text-dim": "var(--text-dim)",
@@ -27,7 +26,6 @@ const config: Config = {
       },
       fontFamily: {
         mono: ["var(--font-mono)", "ui-monospace", "monospace"],
-        serif: ["var(--font-serif)", "Georgia", "serif"],
       },
     },
   },

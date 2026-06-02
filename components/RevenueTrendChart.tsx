@@ -40,6 +40,10 @@ export function RevenueTrendChart() {
 
   const targetY = yFor(targetMonthlyRm);
 
+  const chartSummary = `Monthly revenue by stream. ${months
+    .map((m) => `${m.label}: ${m.total}`)
+    .join("; ")}. Target RM 400K per month.`;
+
   return (
     <div className="card">
       <div className="card-head">
@@ -90,9 +94,11 @@ export function RevenueTrendChart() {
         <svg
           viewBox={`0 0 ${SVG_W} ${SVG_H}`}
           width="100%"
-          preserveAspectRatio="none"
-          style={{ display: "block" }}
+          role="img"
+          aria-label={chartSummary}
+          style={{ display: "block", height: "auto" }}
         >
+          <title>{chartSummary}</title>
           {/* horizontal grid */}
           <g stroke="var(--border)" strokeWidth="1">
             {GRID_TICKS.map((rm) => (

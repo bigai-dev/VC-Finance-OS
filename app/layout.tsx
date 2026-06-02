@@ -29,7 +29,7 @@ export const metadata: Metadata = {
 // Inline pre-hydration script: set data-theme from localStorage before React mounts,
 // avoiding a dark/light flash on initial paint.
 const themeInitScript = `
-(function(){try{var t=localStorage.getItem('theme');if(!t){t='dark';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();
+(function(){try{var t=localStorage.getItem('theme');if(!t){t='light';}document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();
 `;
 
 export default function RootLayout({
