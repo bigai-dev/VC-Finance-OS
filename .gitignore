@@ -34,3 +34,6 @@ next-env.d.ts
 # IDE
 .vscode/
 .idea/
+
+# auto-generated design-review reports
+.impeccable/
